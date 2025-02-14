@@ -30,7 +30,6 @@ class Main extends PluginBase implements Listener {
     public function onEnable(): void {
         // ✅ Config 및 WorldManager 초기화
         ConfigManager::init();
-        WorldManager::init();
 
         $generatorManager = $this->getServer()->getWorldManager()->getGeneratorManager();
 
