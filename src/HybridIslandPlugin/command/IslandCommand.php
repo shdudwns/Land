@@ -43,7 +43,7 @@ class IslandCommand extends Command {
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommandMap->getAll() as $subCommand) {
+            foreach ($this->subCommandMap->getAllNames() as $subCommand) {
                 $sender->sendMessage("§e/island $subCommand");
             }
             return false;
@@ -57,7 +57,7 @@ class IslandCommand extends Command {
         return false;
     }
 
-    // ✅ 명령어 자동완성 미리보기
+    // ✅ 자동완성 미리보기
     public function getAliases(): array {
         return ["isl"];
     }
