@@ -4,14 +4,13 @@ namespace HybridIslandPlugin\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
-class IslandCommand extends Command implements PluginIdentifiableCommand {
+class IslandCommand extends Command {
 
     private SubCommandMap $subCommandMap;
 
@@ -56,10 +55,6 @@ class IslandCommand extends Command implements PluginIdentifiableCommand {
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
         return false;
-    }
-
-    public function getPlugin(): Plugin {
-        return Main::getInstance();
     }
 
     // ✅ 명령어 자동완성 미리보기
