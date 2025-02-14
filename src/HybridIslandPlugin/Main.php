@@ -33,10 +33,19 @@ class Main extends PluginBase implements Listener {
         WorldManager::init();
 
         // ✅ Generator 등록
-        GeneratorManager::getInstance()->addGenerator(IslandGenerator::class, "island", true);
-        GeneratorManager::getInstance()->addGenerator(GridLandGenerator::class, "gridland", true);
-        GeneratorManager::getInstance()->addGenerator(SkyBlockGenerator::class, "skyblock", true);
+        GeneratorManager::addGenerator(IslandGenerator::class, "island", function(string $input): bool {
+        return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
+    });
 
+    // ✅ GridLandGenerator 등록
+    GeneratorManager::addGenerator(GridLandGenerator::class, "gridland", function(string $input): bool {
+        return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
+    });
+
+    // ✅ SkyBlockGenerator 등록
+    GeneratorManager::addGenerator(SkyBlockGenerator::class, "skyblock", function(string $input): bool {
+        return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
+    });
         // ✅ 명령어 등록
         $this->getServer()->getCommandMap()->registerAll("HybridIslandPlugin", [
             new IslandCommand(),
