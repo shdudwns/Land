@@ -68,4 +68,10 @@ class ConfigManager {
             self::$configs[$fileName]->save();
         }
     }
+
+    public static function saveAll(): void {
+        foreach (self::$configs as $config) {
+            $config->save();
+        }
+    }
 }
