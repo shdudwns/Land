@@ -9,12 +9,31 @@ use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
+use HybridIslandPlugin\command\utils\SubCommandMap;
 
 class IslandCommand extends Command implements PluginIdentifiableCommand {
+
+    private SubCommandMap $subCommandMap;
 
     public function __construct() {
         parent::__construct("island", "섬 관리 명령어", "/island <create|delete|home|info>", ["isl"]);
         $this->setPermission("hybridislandplugin.command.island");
+
+        // ✅ SubCommandMap 연동
+        $this->subCommandMap = new SubCommandMap();
+        $this->subCommandMap->registerSubCommand("create", function(Player $sender) {
+            IslandManager::createIsland($sender);
+        });
+        $this->subCommandMap->registerSubCommand("delete", function(Player $sender) {
+            IslandManager::deleteIsland($sender);
+        });
+        $this->subCommandMap->registerSubCommand("home", function(Player $sender) {
+            IslandManager::teleportToIsland($sender);
+        });
+        $this->subCommandMap->registerSubCommand("info", function(Player $sender) {
+            $info = IslandManager::getIslandInfo($sender);
+            $sender->sendMessage($info);
+        });
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
@@ -25,39 +44,30 @@ class IslandCommand extends Command implements PluginIdentifiableCommand {
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            $sender->sendMessage("§e/island create §f- 섬 생성");
-            $sender->sendMessage("§e/island delete §f- 섬 삭제");
-            $sender->sendMessage("§e/island home §f- 섬으로 이동");
-            $sender->sendMessage("§e/island info §f- 섬 정보 보기");
+            foreach ($this->subCommandMap->getAll() as $subCommand) {
+                $sender->sendMessage("§e/island $subCommand");
+            }
             return false;
         }
 
-        switch (strtolower($args[0])) {
-            case "create":
-                IslandManager::createIsland($sender);
-                break;
-
-            case "delete":
-                IslandManager::deleteIsland($sender);
-                break;
-
-            case "home":
-                IslandManager::teleportToIsland($sender);
-                break;
-
-            case "info":
-                $info = IslandManager::getIslandInfo($sender);
-                $sender->sendMessage($info);
-                break;
-
-            default:
-                $sender->sendMessage("§c잘못된 명령어입니다.");
-                break;
+        if ($this->subCommandMap->executeSubCommand(strtolower($args[0]), $sender)) {
+            return true;
         }
-        return true;
+
+        $sender->sendMessage("§c잘못된 명령어입니다.");
+        return false;
     }
 
     public function getPlugin(): Plugin {
         return Main::getInstance();
+    }
+
+    // ✅ 명령어 자동완성 미리보기
+    public function getAliases(): array {
+        return ["isl"];
+    }
+
+    public function getUsage(): string {
+        return "/island <create|delete|home|info>";
     }
 }
