@@ -17,7 +17,21 @@ commands:
   skyblock:
     description: SkyBlock 관리 명령어
     usage: /skyblock <create|delete|home|info>
+    aliases: [sb]
     permission: hybridislandplugin.command.skyblock
+    overloads:
+      - name: create
+        type: string
+        description: SkyBlock 생성
+      - name: delete
+        type: string
+        description: SkyBlock 삭제
+      - name: home
+        type: string
+        description: SkyBlock으로 이동
+      - name: info
+        type: string
+        description: SkyBlock 정보 보기
 
 permissions:
   hybridislandplugin.command.island:
