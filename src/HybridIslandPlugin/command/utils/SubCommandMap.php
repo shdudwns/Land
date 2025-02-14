@@ -1,5 +1,6 @@
 <?php
 
+// SubCommandMap.php
 namespace HybridIslandPlugin\command\utils;
 
 use Closure;
@@ -24,8 +25,8 @@ class SubCommandMap {
         return false;
     }
 
-    // ✅ 모든 서브 명령어 가져오기
-    public function getAll(): array {
-        return $this->subCommands;
+    // ✅ 모든 서브 명령어 이름만 반환
+    public function getAllNames(): array {
+        return array_keys($this->subCommands);
     }
 }
