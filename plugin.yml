@@ -2,14 +2,13 @@ name: HybridIslandPlugin
 version: 1.0.0
 main: HybridIslandPlugin\Main
 api: [5.24.0]
-load: POSTWORLD
 author: YoungJun
 description: SkyBlock 및 GridLand를 포함한 섬 관리 플러그인
 
 commands:
   island:
     description: 섬 관리 명령어
-    usage: /island <create|delete|home|info|expand>
+    usage: /island <create|delete|home|info>
     permission: hybridislandplugin.command.island
   gridland:
     description: GridLand 관리 명령어
