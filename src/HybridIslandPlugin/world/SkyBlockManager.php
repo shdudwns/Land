@@ -119,4 +119,18 @@ class SkyBlockManager {
         }
         return null;
     }
+
+    public static function isInsideSkyBlock(Vector3 $pos): bool {
+        $allIslands = SkyBlockConfig::getAllIslands();
+
+        foreach ($allIslands as $island) {
+            $worldName = $island["world"];
+            $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
+
+            if ($world !== null && $pos->world->getFolderName() === $worldName) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
