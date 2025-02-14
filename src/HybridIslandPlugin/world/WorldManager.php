@@ -4,23 +4,18 @@ namespace HybridIslandPlugin\world;
 
 use pocketmine\world\World;
 use pocketmine\player\Player;
-use pocketmine\world\WorldCreationOptions;
 use pocketmine\Server;
 use HybridIslandPlugin\config\ConfigManager;
-use HybridIslandPlugin\generator\IslandGenerator;
-use HybridIslandPlugin\generator\GridLandGenerator;
-use HybridIslandPlugin\generator\SkyBlockGenerator;
 
 class WorldManager {
 
     public static function init(): void {
-        // ✅ 기존 데이터 로드 및 월드 초기화
-        self::loadWorlds("islandData", IslandGenerator::class);
-        self::loadWorlds("gridLandData", GridLandGenerator::class);
-        self::loadWorlds("skyBlockData", SkyBlockGenerator::class);
+        self::loadWorlds("islandData", "island");
+        self::loadWorlds("gridLandData", "gridland");
+        self::loadWorlds("skyBlockData", "skyblock");
     }
 
-    private static function loadWorlds(string $dataFile, string $generatorClass): void {
+    private static function loadWorlds(string $dataFile, string $type): void {
         $config = ConfigManager::getConfig($dataFile);
         $worlds = $config->getAll();
 
@@ -32,20 +27,21 @@ class WorldManager {
     }
 
     public static function createWorld(string $type, string $worldName): bool {
-        $generatorClass = match ($type) {
-            "island" => IslandGenerator::class,
-            "gridland" => GridLandGenerator::class,
-            "skyblock" => SkyBlockGenerator::class,
-            default => null,
-        };
-
-        if ($generatorClass === null) return false;
-
         if (Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) return false;
 
-        $options = new WorldCreationOptions();
-        $options->setGeneratorClass($generatorClass);
-        Server::getInstance()->getWorldManager()->generateWorld($worldName, $options);
+        // ✅ WorldCreationOptionsManager 연동
+        try {
+            $options = WorldCreationOptionsManager::getOptions($type);
+            Server::getInstance()->getWorldManager()->generateWorld($worldName, $options);
+
+            // ✅ World 생성 후에 스폰 위치 재확인
+            $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
+            if ($world instanceof World) {
+                $world->setSpawnLocation($options->getSpawnLocation());
+            }
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
 
         return true;
     }
