@@ -4,7 +4,6 @@ namespace HybridIslandPlugin\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\SkyBlockManager;
 use HybridIslandPlugin\Main;
@@ -43,7 +42,7 @@ class SkyBlockCommand extends Command {
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommandMap->getAll() as $subCommand) {
+            foreach ($this->subCommandMap->getAll() as $subCommand => $callback) {
                 $sender->sendMessage("§e/skyblock $subCommand");
             }
             return false;
@@ -55,6 +54,32 @@ class SkyBlockCommand extends Command {
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
         return false;
+    }
+
+    // ✅ 자동완성 미리보기 추가
+    public function getOverloads(): array {
+        return [
+            "create" => [
+                "description" => "SkyBlock 생성",
+                "type" => "string",
+                "name" => "create"
+            ],
+            "delete" => [
+                "description" => "SkyBlock 삭제",
+                "type" => "string",
+                "name" => "delete"
+            ],
+            "home" => [
+                "description" => "SkyBlock으로 이동",
+                "type" => "string",
+                "name" => "home"
+            ],
+            "info" => [
+                "description" => "SkyBlock 정보 보기",
+                "type" => "string",
+                "name" => "info"
+            ],
+        ];
     }
 
     // ✅ 자동완성 미리보기
