@@ -7,72 +7,67 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
-use pocketmine\command\CommandExecutor;
 use HybridIslandPlugin\world\SkyBlockManager;
 use HybridIslandPlugin\Main;
+use HybridIslandPlugin\command\utils\SubCommandMap;
 
-class SkyBlockCommand extends Command implements PluginIdentifiableCommand, CommandExecutor {
+class SkyBlockCommand extends Command implements PluginIdentifiableCommand {
 
-    private array $subCommands = ["create", "delete", "home", "info"];
+    private SubCommandMap $subCommandMap;
 
     public function __construct() {
-        parent::__construct("skyblock", "SkyBlock 관리 명령어", "/skyblock <create|delete|home|info>");
+        parent::__construct("skyblock", "SkyBlock 관리 명령어", "/skyblock <create|delete|home|info>", ["sb"]);
         $this->setPermission("hybridislandplugin.command.skyblock");
+
+        // ✅ SubCommandMap 연동
+        $this->subCommandMap = new SubCommandMap();
+        $this->subCommandMap->registerSubCommand("create", function(Player $sender) {
+            SkyBlockManager::createSkyBlock($sender);
+        });
+        $this->subCommandMap->registerSubCommand("delete", function(Player $sender) {
+            SkyBlockManager::deleteSkyBlock($sender);
+        });
+        $this->subCommandMap->registerSubCommand("home", function(Player $sender) {
+            SkyBlockManager::teleportToSkyBlock($sender);
+        });
+        $this->subCommandMap->registerSubCommand("info", function(Player $sender) {
+            $info = SkyBlockManager::getSkyBlockInfo($sender);
+            $sender->sendMessage($info);
+        });
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
         if (!$sender instanceof Player) {
-            $sender->sendMessage("§c게임 내에서만 사용 가능합니다.");
+            $sender->sendMessage("§c플레이어만 사용 가능합니다.");
             return false;
         }
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommands as $subCommand) {
+            foreach ($this->subCommandMap->getAll() as $subCommand) {
                 $sender->sendMessage("§e/skyblock $subCommand");
             }
             return false;
         }
 
-        switch (strtolower($args[0])) {
-            case "create":
-                SkyBlockManager::createSkyBlock($sender);
-                break;
-
-            case "delete":
-                SkyBlockManager::deleteSkyBlock($sender);
-                break;
-
-            case "home":
-                SkyBlockManager::teleportToSkyBlock($sender);
-                break;
-
-            case "info":
-                $info = SkyBlockManager::getSkyBlockInfo($sender);
-                $sender->sendMessage($info);
-                break;
-
-            default:
-                $sender->sendMessage("§c잘못된 명령어입니다.");
-                break;
+        if ($this->subCommandMap->executeSubCommand(strtolower($args[0]), $sender)) {
+            return true;
         }
-        return true;
+
+        $sender->sendMessage("§c잘못된 명령어입니다.");
+        return false;
     }
 
     public function getPlugin(): Plugin {
         return Main::getInstance();
     }
 
-    // ✅ 명령어 자동완성 미리보기
+    // ✅ 자동완성 미리보기
     public function getAliases(): array {
         return ["sb"];
     }
 
     public function getUsage(): string {
         return "/skyblock <create|delete|home|info>";
-    }
-
-    public function getSubCommands(): array {
-        return $this->subCommands;
     }
 }
