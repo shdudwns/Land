@@ -62,6 +62,7 @@ class IslandManager {
             );
         }
         return false;
+    }
         
     // ✅ 섬 삭제
     public static function deleteIsland(Player $player): void {
