@@ -3,49 +3,53 @@
 namespace HybridIslandPlugin;
 
 use pocketmine\plugin\PluginBase;
+use pocketmine\world\generator\GeneratorManager;
 use pocketmine\event\Listener;
+use HybridIslandPlugin\generator\IslandGenerator;
+use HybridIslandPlugin\generator\GridLandGenerator;
+use HybridIslandPlugin\generator\SkyBlockGenerator;
 use HybridIslandPlugin\config\ConfigManager;
 use HybridIslandPlugin\world\WorldManager;
 use HybridIslandPlugin\command\IslandCommand;
 use HybridIslandPlugin\command\GridLandCommand;
 use HybridIslandPlugin\command\SkyBlockCommand;
-use HybridIslandPlugin\generator\GridLandGenerator;
-use HybridIslandPlugin\generator\SkyBlockGenerator;
+use HybridIslandPlugin\listener\EventListener;
 
 class Main extends PluginBase implements Listener {
 
     private static Main $instance;
-    private ConfigManager $configManager;
-    private WorldManager $worldManager;
 
     public static function getInstance(): Main {
         return self::$instance;
     }
 
-    public function onEnable(): void {
+    public function onLoad(): void {
         self::$instance = $this;
+    }
 
+    public function onEnable(): void {
+        // ✅ Config 및 WorldManager 초기화
         ConfigManager::init();
-        
-        $this->configManager = new ConfigManager($this);
-        $this->worldManager = new WorldManager($this);
+        WorldManager::init();
 
-        $this->getServer()->getCommandMap()->registerAll("hybridisland", [
-            new IslandCommand($this),
-            new GridLandCommand($this),
-            new SkyBlockCommand($this)
+        // ✅ Generator 등록
+        GeneratorManager::getInstance()->addGenerator(IslandGenerator::class, "island", true);
+        GeneratorManager::getInstance()->addGenerator(GridLandGenerator::class, "gridland", true);
+        GeneratorManager::getInstance()->addGenerator(SkyBlockGenerator::class, "skyblock", true);
+
+        // ✅ 명령어 등록
+        $this->getServer()->getCommandMap()->registerAll("HybridIslandPlugin", [
+            new IslandCommand(),
+            new GridLandCommand(),
+            new SkyBlockCommand()
         ]);
 
-        $this->getServer()->getPluginManager()->registerEvents($this, $this);
-
-        $this->getLogger()->info("HybridIslandPlugin 활성화 완료");
+        // ✅ 이벤트 리스너 등록
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
     }
 
-    public function getConfigManager(): ConfigManager {
-        return $this->configManager;
-    }
-
-    public function getWorldManager(): WorldManager {
-        return $this->worldManager;
+    public function onDisable(): void {
+        // ✅ 플러그인 비활성화 시 데이터 저장
+        ConfigManager::saveAll();
     }
 }
