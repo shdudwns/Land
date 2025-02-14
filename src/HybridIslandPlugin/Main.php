@@ -3,13 +3,13 @@
 namespace HybridIslandPlugin;
 
 use pocketmine\plugin\PluginBase;
-use pocketmine\world\generator\GeneratorManager;
 use pocketmine\event\Listener;
 use HybridIslandPlugin\generator\IslandGenerator;
 use HybridIslandPlugin\generator\GridLandGenerator;
 use HybridIslandPlugin\generator\SkyBlockGenerator;
 use HybridIslandPlugin\config\ConfigManager;
-use HybridIslandPlugin\world\WorldManager;
+use pocketmine\world\generator\GeneratorManager;
+use pocketmine\world\WorldManager;
 use HybridIslandPlugin\command\IslandCommand;
 use HybridIslandPlugin\command\GridLandCommand;
 use HybridIslandPlugin\command\SkyBlockCommand;
@@ -32,18 +32,20 @@ class Main extends PluginBase implements Listener {
         ConfigManager::init();
         WorldManager::init();
 
-        // ✅ Generator 등록
-        GeneratorManager::addGenerator(IslandGenerator::class, "island", function(string $input): bool {
+        $generatorManager = $this->getServer()->getWorldManager()->getGeneratorManager();
+
+    // ✅ IslandGenerator 등록
+    $generatorManager->addGenerator(IslandGenerator::class, "island", function(string $input): bool {
         return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
     });
 
     // ✅ GridLandGenerator 등록
-    GeneratorManager::addGenerator(GridLandGenerator::class, "gridland", function(string $input): bool {
+    $generatorManager->addGenerator(GridLandGenerator::class, "gridland", function(string $input): bool {
         return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
     });
 
     // ✅ SkyBlockGenerator 등록
-    GeneratorManager::addGenerator(SkyBlockGenerator::class, "skyblock", function(string $input): bool {
+    $generatorManager->addGenerator(SkyBlockGenerator::class, "skyblock", function(string $input): bool {
         return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
     });
         // ✅ 명령어 등록
