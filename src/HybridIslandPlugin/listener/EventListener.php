@@ -70,9 +70,10 @@ class EventListener implements Listener {
     // ✅ 보호된 지역인지 확인 (섬 내부인지 확인)
     private function isProtectedArea(Player $player, Vector3 $pos): bool {
         // Island 영역 체크
-        if (IslandManager::isInsideIsland($pos)) {
-            return true;
-        }
+        if (!IslandManager::isInsideIsland($player, $pos)) {
+    $player->sendMessage("§c이 지역에 들어갈 수 없습니다.");
+    $event->cancel();
+}
 
         // GridLand 영역 체크
         if (GridLandManager::isInsideGridLand($pos)) {
