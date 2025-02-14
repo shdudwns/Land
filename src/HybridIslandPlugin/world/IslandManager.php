@@ -45,24 +45,20 @@ class IslandManager {
         }
     }
 
-    public static function isInsideIsland(Player $player, Vector3 $pos): bool {
-        $data = IslandConfig::getIsland($player->getName());
-        if ($data) {
-            $location = $data["location"];
-            $size = $data["size"] ?? 100; // 섬 크기 기본값 100
+    public static function isInsideIsland(Vector3 $pos): bool {
+    // 섬 영역 정보를 가져와서 확인
+    foreach (self::getAllIslands() as $island) {
+        $startX = $island["location"]["x"];
+        $startZ = $island["location"]["z"];
+        $size = $island["size"] ?? 100;
 
-            $startX = $location["x"] - ($size / 2);
-            $endX = $location["x"] + ($size / 2);
-            $startZ = $location["z"] - ($size / 2);
-            $endZ = $location["z"] + ($size / 2);
-
-            return (
-                $pos->getX() >= $startX && $pos->getX() <= $endX &&
-                $pos->getZ() >= $startZ && $pos->getZ() <= $endZ
-            );
+        if ($pos->getX() >= $startX && $pos->getX() <= $startX + $size &&
+            $pos->getZ() >= $startZ && $pos->getZ() <= $startZ + $size) {
+            return true;
         }
-        return false;
     }
+    return false;
+}
         
     // ✅ 섬 삭제
     public static function deleteIsland(Player $player): void {
