@@ -7,12 +7,12 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\math\Vector3;  // ✅ Vector3 임포트 추가
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\world\GridLandManager;
 use HybridIslandPlugin\world\SkyBlockManager;
 use HybridIslandPlugin\Main;
-use pocketmine\math\Vector3;
 
 class EventListener implements Listener {
 
@@ -23,7 +23,7 @@ class EventListener implements Listener {
     // ✅ 블록 설치 및 파괴 보호
     public function onBlockPlace(BlockPlaceEvent $event): void {
         $player = $event->getPlayer();
-        $pos = $event->getBlock()->getPosition();
+        $pos = $event->getBlock()->getPosition()->asVector3();  // 🔄 asVector3() 추가
         
         if (!$this->isOwnerOrMember($player, $pos)) {
             $player->sendMessage("§c해당 지역에 블록을 설치할 수 없습니다.");
@@ -33,7 +33,7 @@ class EventListener implements Listener {
 
     public function onBlockBreak(BlockBreakEvent $event): void {
         $player = $event->getPlayer();
-        $pos = $event->getBlock()->getPosition();
+        $pos = $event->getBlock()->getPosition()->asVector3();  // 🔄 asVector3() 추가
 
         if (!$this->isOwnerOrMember($player, $pos)) {
             $player->sendMessage("§c해당 지역의 블록을 파괴할 수 없습니다.");
@@ -47,7 +47,7 @@ class EventListener implements Listener {
         $entity = $event->getEntity();
 
         if ($damager instanceof Player && $entity instanceof Player) {
-            if (!$this->isOwnerOrMember($damager, $entity->getPosition())) {
+            if (!$this->isOwnerOrMember($damager, $entity->getPosition()->asVector3())) {  // 🔄 asVector3() 추가
                 $damager->sendMessage("§c이 지역에서는 PvP가 허용되지 않습니다.");
                 $event->cancel();
             }
@@ -57,7 +57,7 @@ class EventListener implements Listener {
     // ✅ 접근 권한 관리
     public function onPlayerMove(PlayerMoveEvent $event): void {
         $player = $event->getPlayer();
-        $pos = $player->getPosition();
+        $pos = $player->getPosition()->asVector3();  // 🔄 asVector3() 추가
 
         if (!$this->isOwnerOrMember($player, $pos)) {
             $player->sendMessage("§c이 지역에 들어갈 수 없습니다.");
@@ -68,8 +68,6 @@ class EventListener implements Listener {
     // ✅ 소유자 또는 멤버 확인 (모든 섬 타입 연동)
     private function isOwnerOrMember(Player $player, Vector3 $pos): bool {
         // Island
-        // 🔄 호출부 수정
-        $pos = $event->getBlock()->getPosition()->asVector3();
         if (IslandManager::hasIsland($player)) {
             $island = IslandManager::getIslandByPosition($pos);
             if ($island !== null && ($island["owner"] === $player->getName() || in_array($player->getName(), $island["members"] ?? []))) {
