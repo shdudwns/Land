@@ -12,6 +12,7 @@ use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\world\GridLandManager;
 use HybridIslandPlugin\world\SkyBlockManager;
 use HybridIslandPlugin\Main;
+use pocketmine\math\Vector3;
 
 class EventListener implements Listener {
 
@@ -67,6 +68,8 @@ class EventListener implements Listener {
     // ✅ 소유자 또는 멤버 확인 (모든 섬 타입 연동)
     private function isOwnerOrMember(Player $player, Vector3 $pos): bool {
         // Island
+        // 🔄 호출부 수정
+        $pos = $event->getBlock()->getPosition()->asVector3();
         if (IslandManager::hasIsland($player)) {
             $island = IslandManager::getIslandByPosition($pos);
             if ($island !== null && ($island["owner"] === $player->getName() || in_array($player->getName(), $island["members"] ?? []))) {
