@@ -88,4 +88,35 @@ class SkyBlockManager {
         }
         return "§cSkyBlock 정보가 없습니다.";
     }
+
+    public static function isInsideGridLand(Vector3 $pos): bool {
+        $allLands = GridLandConfig::getAllIslands();
+        
+        foreach ($allLands as $landData) {
+            $location = $landData['location'];
+            if (
+                $pos->x >= $location['startX'] && $pos->x <= $location['endX'] &&
+                $pos->z >= $location['startZ'] && $pos->z <= $location['endZ']
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ✅ GridLand 위치로 소유자 정보 확인
+    public static function getGridLandByPosition(Vector3 $pos): ?array {
+        $allLands = GridLandConfig::getAllIslands();
+        
+        foreach ($allLands as $landData) {
+            $location = $landData['location'];
+            if (
+                $pos->x >= $location['startX'] && $pos->x <= $location['endX'] &&
+                $pos->z >= $location['startZ'] && $pos->z <= $location['endZ']
+            ) {
+                return $landData;
+            }
+        }
+        return null;
+    }
 }
