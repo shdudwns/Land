@@ -15,7 +15,7 @@ class SkyBlockManager {
         return $data !== null;
     }
 
-    // ✅ SkyBlock 생성
+    // ✅ SkyBlock 생성 (16x16 크기)
     public static function createSkyBlock(Player $player): void {
         if (self::hasSkyBlock($player)) {
             $player->sendMessage("§c이미 SkyBlock이 존재합니다.");
@@ -29,9 +29,9 @@ class SkyBlockManager {
             "number" => $blockNumber,
             "world" => $worldName,
             "location" => [
-                "x" => $blockNumber * 300,
-                "y" => 100,
-                "z" => $blockNumber * 300
+                "x" => 8,   // 16x16 중앙 스폰
+                "y" => 65,
+                "z" => 8
             ]
         ];
 
