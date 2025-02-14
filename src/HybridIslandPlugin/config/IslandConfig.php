@@ -9,7 +9,9 @@ class IslandConfig {
     private static Config $config;
 
     public static function init(): void {
-        self::$config = ConfigManager::getConfig("islandData");
+        if (!isset(self::$config)) { 
+            self::$config = ConfigManager::getConfig("islandData");
+        }
     }
 
     public static function getAllIslands(): array {
