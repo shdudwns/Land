@@ -31,7 +31,7 @@ class Main extends PluginBase implements Listener {
         // ✅ Config 및 WorldManager 초기화
         ConfigManager::init();
 
-        $generatorManager = $this->getServer()->getWorldManager()->getGeneratorManager();
+        $generatorManager = $this->getServer()->getGeneratorManager();
 
     // ✅ IslandGenerator 등록
     $generatorManager->addGenerator(IslandGenerator::class, "island", function(string $input): bool {
