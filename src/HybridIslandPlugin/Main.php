@@ -36,12 +36,21 @@ class Main extends PluginBase implements Listener {
     // ✅ IslandGenerator 등록
     $generatorManager->addGenerator(IslandGenerator::class, "island", 
     function(string $preset): ?\InvalidArgumentException {
-        // ✅ 문자, 숫자, 언더스코어만 허용
-        if (preg_match('/^[a-zA-Z0-9_]*$/', $preset) === 1) {
+        // ✅ JSON 문자열 디코딩
+        $data = json_decode($preset, true);
+
+        // ✅ 디코딩 실패 또는 preset 키가 없으면 예외 반환
+        if ($data === null || !isset($data["preset"])) {
+            return new \InvalidArgumentException("Invalid JSON or missing preset key.");
+        }
+
+        // ✅ preset 값이 유효한지 검사
+        if (preg_match('/^[a-zA-Z0-9_]+$/', $data["preset"]) === 1) {
             return null;  // 유효하면 예외 없음
         }
+
         // 유효하지 않으면 예외 객체 반환
-        return new \InvalidArgumentException("Invalid preset: $preset");
+        return new \InvalidArgumentException("Invalid preset: " . $data["preset"]);
     }
 );
 
