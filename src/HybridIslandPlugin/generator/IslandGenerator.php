@@ -19,6 +19,10 @@ class IslandGenerator extends Generator {
         return "IslandGenerator";
     }
 
+    public function getSettings(): array {
+        return [];
+    }
+
     public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
         $chunk = $world->getChunk($chunkX, $chunkZ);
         if ($chunkX == 0 && $chunkZ == 0) {
