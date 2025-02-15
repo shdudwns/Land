@@ -52,8 +52,8 @@ class IslandCommand extends Command {
         }
 
         $subCommand = strtolower($args[0]);
-        if ($this->subCommandMap->executeSubCommand($subCommand, $sender)) {
-            return true;
+        if (in_array($subCommand, $this->subCommandMap->getAllNames())) {
+            return $this->subCommandMap->executeSubCommand($subCommand, $sender);
         }
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
@@ -62,27 +62,14 @@ class IslandCommand extends Command {
 
     // ✅ 자동완성 미리보기
     public function getOverloads(): array {
-        return [
-            "create" => [
-                "name" => "create",
+        $subCommands = [];
+        foreach ($this->subCommandMap->getAllNames() as $name) {
+            $subCommands[] = [
+                "name" => $name,
                 "type" => "string",
                 "optional" => true
-            ],
-            "delete" => [
-                "name" => "delete",
-                "type" => "string",
-                "optional" => true
-            ],
-            "home" => [
-                "name" => "home",
-                "type" => "string",
-                "optional" => true
-            ],
-            "info" => [
-                "name" => "info",
-                "type" => "string",
-                "optional" => true
-            ]
-        ];
+            ];
+        }
+        return $subCommands;
     }
 }
