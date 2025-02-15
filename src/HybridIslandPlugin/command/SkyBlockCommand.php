@@ -6,7 +6,6 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\SkyBlockManager;
-use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
 class SkyBlockCommand extends Command {
@@ -21,17 +20,20 @@ class SkyBlockCommand extends Command {
         $this->subCommandMap = new SubCommandMap();
         $this->subCommandMap->registerSubCommand("create", function(Player $sender) {
             SkyBlockManager::createSkyBlock($sender);
-        });
+        }, "SkyBlock 생성", "/skyblock create");
+
         $this->subCommandMap->registerSubCommand("delete", function(Player $sender) {
             SkyBlockManager::deleteSkyBlock($sender);
-        });
+        }, "SkyBlock 삭제", "/skyblock delete");
+
         $this->subCommandMap->registerSubCommand("home", function(Player $sender) {
             SkyBlockManager::teleportToSkyBlock($sender);
-        });
+        }, "SkyBlock으로 이동", "/skyblock home");
+
         $this->subCommandMap->registerSubCommand("info", function(Player $sender) {
             $info = SkyBlockManager::getSkyBlockInfo($sender);
             $sender->sendMessage($info);
-        });
+        }, "SkyBlock 정보 보기", "/skyblock info");
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
@@ -42,13 +44,14 @@ class SkyBlockCommand extends Command {
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommandMap->getAll() as $subCommand => $callback) {
-                $sender->sendMessage("§e/skyblock $subCommand");
+            foreach ($this->subCommandMap->getAllInfo() as $name => $info) {
+                $sender->sendMessage("§e/skyblock $name §7- " . $info["description"]);
             }
             return false;
         }
 
-        if ($this->subCommandMap->executeSubCommand(strtolower($args[0]), $sender)) {
+        $subCommand = strtolower($args[0]);
+        if ($this->subCommandMap->executeSubCommand($subCommand, $sender)) {
             return true;
         }
 
@@ -58,36 +61,6 @@ class SkyBlockCommand extends Command {
 
     // ✅ 자동완성 미리보기 추가
     public function getOverloads(): array {
-        return [
-            "create" => [
-                "description" => "SkyBlock 생성",
-                "type" => "string",
-                "name" => "create"
-            ],
-            "delete" => [
-                "description" => "SkyBlock 삭제",
-                "type" => "string",
-                "name" => "delete"
-            ],
-            "home" => [
-                "description" => "SkyBlock으로 이동",
-                "type" => "string",
-                "name" => "home"
-            ],
-            "info" => [
-                "description" => "SkyBlock 정보 보기",
-                "type" => "string",
-                "name" => "info"
-            ],
-        ];
-    }
-
-    // ✅ 자동완성 미리보기
-    public function getAliases(): array {
-        return ["sb"];
-    }
-
-    public function getUsage(): string {
-        return "/skyblock <create|delete|home|info>";
+        return $this->subCommandMap->getAllNames();
     }
 }
