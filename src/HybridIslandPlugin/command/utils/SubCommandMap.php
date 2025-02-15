@@ -31,18 +31,14 @@ class SubCommandMap {
         return array_keys($this->subCommands);
     }
 
-    // ✅ 자동완성용 문자열 반환
-    public function getAutoComplete(): string {
-        return implode(" ", $this->getAllNames());
-    }
-
+    // ✅ 서브 명령어 설명 반환
     public function getAllInfo(): array {
-    $info = [];
-    foreach ($this->subCommands as $name => $data) {
-        $info[$name] = [
-            "description" => $data["description"]
-        ];
+        $info = [];
+        foreach ($this->subCommands as $name => $data) {
+            $info[$name] = [
+                "description" => $data["description"]
+            ];
+        }
+        return $info;
     }
-    return $info;
-}
 }
