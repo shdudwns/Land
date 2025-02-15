@@ -21,7 +21,9 @@ class IslandGenerator extends Generator {
     }
 
     public function getSettings(): array {
-        return (new GeneratorOptions([]))->toArray(); // ✅ GeneratorOptions 사용
+        return [
+            "preset" => "island"  // 사용자가 필요로 하는 설정값
+        ];
     }
 
     public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
