@@ -4,12 +4,15 @@ namespace HybridIslandPlugin\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\player\Player;
+use pocketmine\plugin\PluginBase;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 use HybridIslandPlugin\command\utils\CommandParameter;
 
-class IslandCommand extends Command {
+class IslandCommand extends Command implements Listener {
 
     private SubCommandMap $subCommandMap;
     private CommandParameter $parameter;
@@ -63,11 +66,6 @@ class IslandCommand extends Command {
         return false;
     }
 
-    // ✅ 자동완성 미리보기 제공
-    public function getAutoComplete(string $input): array {
-        return $this->parameter->getAutoComplete($input);
-    }
-
     // ✅ 자동완성 데이터 PocketMine-MP 5.x와 연동
     public function getOverloads(): array {
         return [
@@ -82,5 +80,19 @@ class IslandCommand extends Command {
                 ]
             ]
         ];
+    }
+
+    // ✅ 플레이어 명령어 실시간 감지
+    public function onPlayerCommandPreprocess(PlayerCommandPreprocessEvent $event): void {
+        $message = $event->getMessage();
+        if (str_starts_with($message, "/island ")) {
+            $args = explode(" ", substr($message, 8));
+            if (count($args) === 1) {
+                $matches = $this->parameter->getAutoComplete($args[0]);
+                if (!empty($matches)) {
+                    $event->getPlayer()->sendMessage("§7사용 가능한 서브 명령어: §e" . implode(", ", $matches));
+                }
+            }
+        }
     }
 }
