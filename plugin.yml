@@ -9,13 +9,21 @@ commands:
   island:
     description: 섬 관리 명령어
     usage: /island <create|delete|home|info>
-    permission: hybridislandplugin.command.island
     aliases: [isl]
+    permission: hybridislandplugin.command.island
     subcommands:
-      create: "섬 생성"
-      delete: "섬 삭제"
-      home: "섬으로 이동"
-      info: "섬 정보 보기"
+      create:
+        description: 섬 생성
+        usage: /island create
+      delete:
+        description: 섬 삭제
+        usage: /island delete
+      home:
+        description: 섬으로 이동
+        usage: /island home
+      info:
+        description: 섬 정보 보기
+        usage: /island info
   gridland:
     description: GridLand 관리 명령어
     usage: /gridland <create|delete|home|info>
