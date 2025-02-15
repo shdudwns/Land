@@ -56,16 +56,29 @@ class WorldManager {
 }
     
     public static function teleportToWorld(Player $player, string $worldName): bool {
-        if (!Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
-            if (!Server::getInstance()->getWorldManager()->loadWorld($worldName)) {
-                return false;
-            }
+    $worldManager = Server::getInstance()->getWorldManager();
+    
+    // ✅ 월드가 로드되지 않은 경우 로드
+    if (!$worldManager->isWorldLoaded($worldName)) {
+        if (!$worldManager->loadWorld($worldName)) {
+            return false;
         }
-
-        $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
-        $player->teleport($world->getSafeSpawn());
-        return true;
     }
+
+    $world = $worldManager->getWorldByName($worldName);
+
+    // ✅ 스폰 청크 강제 생성 (0, 0)
+    $world->loadChunk(0, 0);
+
+    // ✅ 청크 생성 대기
+    while (!$world->isChunkGenerated(0, 0)) {
+        $world->getChunk(0, 0);
+    }
+
+    // ✅ 플레이어 이동
+    $player->teleport($world->getSafeSpawn());
+    return true;
+}
 
     public static function deleteWorld(string $worldName): bool {
         if (Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
