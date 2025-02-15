@@ -21,23 +21,23 @@ class IslandCommand extends Command {
         $this->subCommandMap = new SubCommandMap();
         $this->subCommandMap->registerSubCommand("create", function(Player $sender) {
             IslandManager::createIsland($sender);
-        }, "섬 생성", "/island create");
+        }, "섬 생성");
 
         $this->subCommandMap->registerSubCommand("delete", function(Player $sender) {
             IslandManager::deleteIsland($sender);
-        }, "섬 삭제", "/island delete");
+        }, "섬 삭제");
 
         $this->subCommandMap->registerSubCommand("home", function(Player $sender) {
             IslandManager::teleportToIsland($sender);
-        }, "섬으로 이동", "/island home");
+        }, "섬으로 이동");
 
         $this->subCommandMap->registerSubCommand("info", function(Player $sender) {
             $info = IslandManager::getIslandInfo($sender);
             $sender->sendMessage($info);
-        }, "섬 정보 보기", "/island info");
+        }, "섬 정보 보기");
 
         // ✅ 자동완성 파라미터 설정
-        $this->parameter = new CommandParameter("subcommand", ["create", "delete", "home", "info"]);
+        $this->parameter = new CommandParameter("subcommand", $this->subCommandMap->getAllNames());
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
@@ -56,7 +56,7 @@ class IslandCommand extends Command {
 
         $subCommand = strtolower($args[0]);
         if (in_array($subCommand, $this->subCommandMap->getAllNames())) {
-            return $this->subCommandMap->executeSubCommand($subCommand, $sender, $args);
+            return $this->subCommandMap->executeSubCommand($subCommand, $sender, array_slice($args, 1));
         }
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
@@ -66,5 +66,21 @@ class IslandCommand extends Command {
     // ✅ 자동완성 미리보기 제공
     public function getAutoComplete(string $input): array {
         return $this->parameter->getAutoComplete($input);
+    }
+
+    // ✅ 자동완성 데이터 PocketMine-MP 5.x와 연동
+    public function getOverloads(): array {
+        return [
+            [
+                "parameters" => [
+                    [
+                        "name" => $this->parameter->getName(),
+                        "type" => "string",
+                        "optional" => false,
+                        "enum" => $this->parameter->getEnumValues()
+                    ]
+                ]
+            ]
+        ];
     }
 }
