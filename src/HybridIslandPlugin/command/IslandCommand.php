@@ -4,14 +4,12 @@ namespace HybridIslandPlugin\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\CommandExecutor;
 use pocketmine\player\Player;
-use pocketmine\plugin\Plugin;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
-class IslandCommand extends Command implements CommandExecutor {
+class IslandCommand extends Command {
 
     private SubCommandMap $subCommandMap;
 
