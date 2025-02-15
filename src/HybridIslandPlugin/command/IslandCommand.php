@@ -39,11 +39,8 @@ class IslandCommand extends Command {
             return true;
         }
 
-        if (empty($args[0])) {
-            $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommandMap->getAllNames() as $subCommand) {
-                $sender->sendMessage("§e/island $subCommand");
-            }
+        if (empty($args)) {
+            $this->suggestSubCommands($sender);
             return true;
         }
 
@@ -56,12 +53,19 @@ class IslandCommand extends Command {
         return true;
     }
 
-    // ✅ 명령어 자동완성 미리보기
+    // ✅ 자동완성 미리보기
+    private function suggestSubCommands(Player $sender): void {
+        $sender->sendMessage("§a사용 가능한 명령어:");
+        foreach ($this->subCommandMap->getAllNames() as $subCommand) {
+            $sender->sendMessage("§e/island $subCommand");
+        }
+    }
+
     public function getAliases(): array {
         return ["isl"];
     }
 
-    public function getUsage(): string {
-        return "/island <create|delete|home|info>";
+    public function getSubCommands(): array {
+        return $this->subCommandMap->getAllNames();
     }
 }
