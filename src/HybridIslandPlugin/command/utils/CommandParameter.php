@@ -3,15 +3,31 @@
 namespace HybridIslandPlugin\command\utils;
 
 class CommandParameter {
-    public string $name;
-    public int $type;
-    public bool $optional;
-    public array $enumValues;
 
-    public function __construct(string $name, int $type, bool $optional = false, array $enumValues = []) {
+    private string $name;
+    private array $enumValues;
+
+    public function __construct(string $name, array $enumValues) {
         $this->name = $name;
-        $this->type = $type;
-        $this->optional = $optional;
         $this->enumValues = $enumValues;
+    }
+
+    public function getName(): string {
+        return $this->name;
+    }
+
+    public function getEnumValues(): array {
+        return $this->enumValues;
+    }
+
+    // ✅ 자동완성 데이터 반환
+    public function getAutoComplete(string $input): array {
+        $matches = [];
+        foreach ($this->enumValues as $value) {
+            if (str_starts_with($value, $input)) {
+                $matches[] = $value;
+            }
+        }
+        return $matches;
     }
 }
