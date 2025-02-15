@@ -64,7 +64,7 @@ class IslandCommand extends Command {
         return [
             [
                 "parameters" => [
-                    new CommandParameter("subcommand", CommandParameter::ARG_TYPE_STRING, false, "create", ["create", "delete", "home", "info"])
+                    new CommandParameter("subcommand", CommandParameter::ARG_TYPE_STRING, false, "subcommand", ["create", "delete", "home", "info"])
                 ]
             ]
         ];
