@@ -6,6 +6,9 @@ use pocketmine\world\World;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use HybridIslandPlugin\config\ConfigManager;
+use pocketmine\world\WorldCreationOptions;
+use pocketmine\world\generator\GeneratorManager;
+use pocketmine\world\generator\GeneratorOptions;
 
 class WorldManager {
 
@@ -26,25 +29,21 @@ class WorldManager {
         }
     }
 
-    public static function createWorld(string $type, string $worldName): bool {
-        if (Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) return false;
+    public static function createWorld(string $generatorName, string $worldName): bool {
+    $server = Server::getInstance();
+    $generatorClass = GeneratorManager::getInstance()->getGenerator($generatorName);
 
-        // ✅ WorldCreationOptionsManager 연동
-        try {
-            $options = WorldCreationOptionsManager::getOptions($type);
-            Server::getInstance()->getWorldManager()->generateWorld($worldName, $options);
-
-            // ✅ World 생성 후에 스폰 위치 재확인
-            $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
-            if ($world instanceof World) {
-                $world->setSpawnLocation($options->getSpawnLocation());
-            }
-        } catch (\InvalidArgumentException $e) {
-            return false;
-        }
-
-        return true;
+    if ($generatorClass === null) {
+        return false;
     }
+
+    $options = new GeneratorOptions([]); // ✅ GeneratorOptions 객체화
+    $worldCreationOptions = new WorldCreationOptions()
+        ->setGeneratorClass($generatorClass)
+        ->setGeneratorOptions($options); // ✅ 객체 전달
+
+    return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
+}
 
     public static function teleportToWorld(Player $player, string $worldName): bool {
         if (!Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
