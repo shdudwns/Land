@@ -6,7 +6,6 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
-use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
 class IslandCommand extends Command {
@@ -42,14 +41,14 @@ class IslandCommand extends Command {
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommandMap->getAll() as $subCommand) {
+            foreach ($this->subCommandMap->getAllNames() as $subCommand) {
                 $sender->sendMessage("§e/island $subCommand");
             }
             return false;
         }
 
         $subCommand = strtolower($args[0]);
-        if (in_array($subCommand, $this->subCommandMap->getAll())) {
+        if (in_array($subCommand, $this->subCommandMap->getAllNames())) {
             return $this->subCommandMap->executeSubCommand($subCommand, $sender);
         }
 
