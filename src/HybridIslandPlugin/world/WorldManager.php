@@ -38,7 +38,7 @@ class WorldManager {
     }
 
     // GeneratorEntry에서 클래스 이름을 가져옴
-    $generatorClass = $generatorEntry->getClass(); 
+    $generatorClass = $generatorEntry->getGeneratorClass(); 
 
     // ✅ 최신 PocketMine-MP 5.x 방식으로 수정
     $options = [
