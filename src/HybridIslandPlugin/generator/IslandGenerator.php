@@ -41,9 +41,9 @@ class IslandGenerator extends Generator {
             }
         }
 
+        $chunk->setTerrainDirty(); 
         // ✅ PocketMine-MP에 청크 저장
         $world->setChunk($chunkX, $chunkZ, $chunk);
-        $chunk->setTerrainDirty(); 
     }
 
     public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
