@@ -4,14 +4,15 @@ namespace HybridIslandPlugin\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\CommandParameter;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\command\utils\SubCommandMap;
+use HybridIslandPlugin\command\utils\CommandParameter;
 
 class IslandCommand extends Command {
 
     private SubCommandMap $subCommandMap;
+    private CommandParameter $parameter;
 
     public function __construct() {
         parent::__construct("island", "섬 관리 명령어", "/island <create|delete|home|info>", ["isl"]);
@@ -34,6 +35,9 @@ class IslandCommand extends Command {
             $info = IslandManager::getIslandInfo($sender);
             $sender->sendMessage($info);
         }, "섬 정보 보기", "/island info");
+
+        // ✅ 자동완성 파라미터 설정
+        $this->parameter = new CommandParameter("subcommand", ["create", "delete", "home", "info"]);
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
@@ -59,18 +63,8 @@ class IslandCommand extends Command {
         return false;
     }
 
-    // ✅ 자동완성 미리보기 설정
-    public function getOverloads(): array {
-        return [
-            [
-                "parameters" => [
-                    new CommandParameter("subcommand", CommandParameter::ARG_TYPE_STRING, false, "subcommand", ["create", "delete", "home", "info"])
-                ]
-            ]
-        ];
-    }
-
-    public function getUsage(): string {
-        return "/island <" . $this->subCommandManager->getAutoComplete() . ">";
+    // ✅ 자동완성 미리보기 제공
+    public function getAutoComplete(string $input): array {
+        return $this->parameter->getAutoComplete($input);
     }
 }
