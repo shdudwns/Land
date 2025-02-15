@@ -50,7 +50,7 @@ class WorldManager {
 
     $worldCreationOptions = new WorldCreationOptions();
     $worldCreationOptions->setGeneratorClass($generatorClass); // 클래스 이름을 문자열로 전달
-    $worldCreationOptions->setGeneratorOptions($optionsString); // JSON 문자열로 전달
+    $worldCreationOptions->setGeneratorOptions($generatorName); // JSON 문자열로 전달
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
 }
