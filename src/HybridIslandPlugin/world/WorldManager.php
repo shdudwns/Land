@@ -68,33 +68,26 @@ class WorldManager {
 
     $world = $worldManager->getWorldByName($worldName);
 
-    // ✅ 스폰 청크 강제 생성 (0, 0)
+    // ✅ 청크 강제 로드 및 상태 확인
     $world->loadChunk(0, 0);
 
-    // ✅ 청크 상태 확인
-    $isGenerated = $world->isChunkGenerated(0, 0);
-    $isPopulated = $world->isChunkPopulated(0, 0);
-
-    // ✅ 디버깅 정보 출력
-    $player->sendMessage("§b[디버그] 청크 상태:");
-    $player->sendMessage("§b- isChunkGenerated: " . ($isGenerated ? "true" : "false"));
-    $player->sendMessage("§b- isChunkPopulated: " . ($isPopulated ? "true" : "false"));
-
-    // ✅ 청크가 생성되지 않았다면 원인 분석 및 오류 메시지 출력
-    if (!$isGenerated) {
-        $player->sendMessage("§c청크가 생성되지 않았습니다. 생성기 설정을 확인하세요.");
-        return false;
+    $attempts = 0;
+    while ((!$world->isChunkGenerated(0, 0) || !$world->isChunkPopulated(0, 0)) && $attempts < 10) {
+        $isGenerated = $world->isChunkGenerated(0, 0) ? "true" : "false";
+        $isPopulated = $world->isChunkPopulated(0, 0) ? "true" : "false";
+        $player->sendMessage("§e[디버그] 청크 상태 확인 중... (시도: $attempts) Generated: $isGenerated, Populated: $isPopulated");
+        $attempts++;
+        sleep(1);
     }
 
-    if (!$isPopulated) {
-        $player->sendMessage("§c청크가 완전히 생성되지 않았습니다. 생성기 populateChunk() 확인 필요.");
+    if ($world->isChunkGenerated(0, 0) && $world->isChunkPopulated(0, 0)) {
+        $player->teleport($world->getSafeSpawn());
+        $player->sendMessage("§a섬으로 이동했습니다!");
+        return true;
+    } else {
+        $player->sendMessage("§c청크가 완전히 생성되지 않았습니다.");
         return false;
     }
-
-    // ✅ 스폰 위치가 안전한지 확인하고 이동
-    $player->teleport($world->getSafeSpawn());
-    $player->sendMessage("§a섬으로 이동했습니다!");
-    return true;
 }
 
     public static function deleteWorld(string $worldName): bool {
