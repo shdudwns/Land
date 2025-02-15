@@ -11,7 +11,7 @@ use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
-class IslandCommand extends Command implements CommandExecutor {
+class IslandCommand extends Command {
 
     private SubCommandMap $subCommandMap;
 
