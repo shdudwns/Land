@@ -5,7 +5,7 @@ namespace HybridIslandPlugin\command\utils;
 use pocketmine\player\Player;
 use pocketmine\command\CommandSender;
 
-class SubCommandManager {
+class SubCommandMap {
     private array $subCommands = [];
 
     // ✅ 서브 명령어 등록
