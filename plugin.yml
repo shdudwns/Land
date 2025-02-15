@@ -18,6 +18,7 @@ commands:
   skyblock:
     description: SkyBlock 관리 명령어
     usage: /skyblock <create|delete|home|info>
+    permission: hybridislandplugin.command.skyblock
 
 permissions:
   hybridislandplugin.command.island:
