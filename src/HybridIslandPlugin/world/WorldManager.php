@@ -72,7 +72,7 @@ class WorldManager {
     $world->loadChunk(0, 0);
 
     $attempts = 0;
-    while ((!$world->isChunkGenerated(0, 0) || !$world->isChunkPopulated(0, 0)) && $attempts < 10) {
+    while ((!$world->isChunkGenerated(0, 0) || !$world->isChunkPopulated(0, 0)) && $attempts < 15) {
         $isGenerated = $world->isChunkGenerated(0, 0) ? "true" : "false";
         $isPopulated = $world->isChunkPopulated(0, 0) ? "true" : "false";
         $player->sendMessage("§e[디버그] 청크 상태 확인 중... (시도: $attempts) Generated: $isGenerated, Populated: $isPopulated");
