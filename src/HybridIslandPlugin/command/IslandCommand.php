@@ -5,13 +5,13 @@ namespace HybridIslandPlugin\command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\CommandExecutor;
-use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
-class IslandCommand extends Command {
+class IslandCommand extends Command implements CommandExecutor {
 
     private SubCommandMap $subCommandMap;
 
@@ -21,50 +21,36 @@ class IslandCommand extends Command {
 
         // ✅ SubCommandMap 연동
         $this->subCommandMap = new SubCommandMap();
-        $this->subCommandMap->registerSubCommand(
-            "create", 
-            function(Player $sender) {
-                IslandManager::createIsland($sender);
-            },
-            "섬 생성",
-            "/island create"
-        );
-        $this->subCommandMap->registerSubCommand(
-            "delete", 
-            function(Player $sender) {
-                IslandManager::deleteIsland($sender);
-            },
-            "섬 삭제",
-            "/island delete"
-        );
-        $this->subCommandMap->registerSubCommand(
-            "home", 
-            function(Player $sender) {
-                IslandManager::teleportToIsland($sender);
-            },
-            "섬으로 이동",
-            "/island home"
-        );
-        $this->subCommandMap->registerSubCommand(
-            "info", 
-            function(Player $sender) {
-                $info = IslandManager::getIslandInfo($sender);
-                $sender->sendMessage($info);
-            },
-            "섬 정보 보기",
-            "/island info"
-        );
+        $this->subCommandMap->registerSubCommand("create", function(Player $sender) {
+            IslandManager::createIsland($sender);
+        }, "섬 생성", "/island create");
+
+        $this->subCommandMap->registerSubCommand("delete", function(Player $sender) {
+            IslandManager::deleteIsland($sender);
+        }, "섬 삭제", "/island delete");
+
+        $this->subCommandMap->registerSubCommand("home", function(Player $sender) {
+            IslandManager::teleportToIsland($sender);
+        }, "섬으로 이동", "/island home");
+
+        $this->subCommandMap->registerSubCommand("info", function(Player $sender) {
+            $info = IslandManager::getIslandInfo($sender);
+            $sender->sendMessage($info);
+        }, "섬 정보 보기", "/island info");
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
         if (!$sender instanceof Player) {
             $sender->sendMessage("§c플레이어만 사용 가능합니다.");
-            return true;
+            return false;
         }
 
-        if (empty($args)) {
-            $this->suggestSubCommands($sender);
-            return true;
+        if (empty($args[0])) {
+            $sender->sendMessage("§a사용 가능한 명령어:");
+            foreach ($this->subCommandMap->getAllInfo() as $name => $info) {
+                $sender->sendMessage("§e/island $name §7- " . $info["description"]);
+            }
+            return false;
         }
 
         $subCommand = strtolower($args[0]);
@@ -73,24 +59,32 @@ class IslandCommand extends Command {
         }
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
-        $this->suggestSubCommands($sender);
-        return true;
+        return false;
     }
 
     // ✅ 자동완성 미리보기
-    private function suggestSubCommands(Player $sender): void {
-        $sender->sendMessage("§a사용 가능한 명령어:");
-        foreach ($this->subCommandMap->getAllNames() as $subCommand) {
-            $info = $this->subCommandMap->getSubCommandInfo($subCommand);
-            $sender->sendMessage("§e/island $subCommand §7- {$info['description']}");
-        }
-    }
-
-    public function getAliases(): array {
-        return ["isl"];
-    }
-
-    public function getSubCommands(): array {
-        return $this->subCommandMap->getAllNames();
+    public function getOverloads(): array {
+        return [
+            "create" => [
+                "name" => "create",
+                "type" => "string",
+                "optional" => true
+            ],
+            "delete" => [
+                "name" => "delete",
+                "type" => "string",
+                "optional" => true
+            ],
+            "home" => [
+                "name" => "home",
+                "type" => "string",
+                "optional" => true
+            ],
+            "info" => [
+                "name" => "info",
+                "type" => "string",
+                "optional" => true
+            ]
+        ];
     }
 }
