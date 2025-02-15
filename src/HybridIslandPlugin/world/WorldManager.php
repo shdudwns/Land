@@ -37,14 +37,18 @@ class WorldManager {
         return false;
     }
 
-    $options = new GeneratorOptions([]); // ✅ GeneratorOptions 객체화
+    // ✅ 최신 PocketMine-MP 5.x 방식으로 수정
+    $options = [
+        "preset" => ""  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
+    ];
+
     $worldCreationOptions = new WorldCreationOptions();
-$worldCreationOptions->setGeneratorClass($generatorClass);
-$worldCreationOptions->setGeneratorOptions($options);
+    $worldCreationOptions->setGeneratorClass($generatorClass);
+    $worldCreationOptions->setGeneratorOptions($options);
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
 }
-
+    
     public static function teleportToWorld(Player $player, string $worldName): bool {
         if (!Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
             if (!Server::getInstance()->getWorldManager()->loadWorld($worldName)) {
