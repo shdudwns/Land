@@ -45,9 +45,12 @@ class WorldManager {
         "preset" => ""  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
     ];
 
+    // 배열을 JSON 문자열로 변환
+    $optionsString = json_encode($options);
+
     $worldCreationOptions = new WorldCreationOptions();
-    $worldCreationOptions->setGeneratorClass($generatorClass); // 이제 클래스 이름을 문자열로 전달
-    $worldCreationOptions->setGeneratorOptions($options);
+    $worldCreationOptions->setGeneratorClass($generatorClass); // 클래스 이름을 문자열로 전달
+    $worldCreationOptions->setGeneratorOptions($optionsString); // JSON 문자열로 전달
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
 }
