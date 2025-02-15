@@ -14,6 +14,11 @@ class IslandCommand extends Command {
 
     private SubCommandMap $subCommandMap;
 
+    private $suggestions = [
+        "create",
+        "delete"
+    ];
+
     public function __construct() {
         parent::__construct("island", "섬 관리 명령어", "/island <create|delete|home|info>", ["isl"]);
         $this->setPermission("hybridislandplugin.command.island");
@@ -103,17 +108,21 @@ class IslandCommand extends Command {
         // 명령어가 /island로 시작하는 경우
         if (strpos($message, "/island") === 0) {
             $args = explode(" ", $message);
-            if (count($args) === 2) {
-                // 사용자가 /island + 입력하는 경우
-                $subCommand = strtolower($args[1]);
-                if (strpos($subCommand, "c") === 0) {
-                    $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: /island create");
-                } elseif (strpos($subCommand, "d") === 0) {
-                    $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: /island delete");
-                }
-            } elseif (count($args) === 1) {
-                // /island 만 입력했을 때
+            if (count($args) === 1) {
+                // "/island"만 입력했을 때
                 $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: create, delete");
+            } elseif (count($args) === 2) {
+                // "/island c" 또는 "/island d" 형태일 때
+                $subCommand = strtolower($args[1]);
+                $matches = [];
+                foreach ($this->suggestions as $suggestion) {
+                    if (strpos($suggestion, $subCommand) === 0) {
+                        $matches[] = $suggestion;
+                    }
+                }
+                if (!empty($matches)) {
+                    $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: " . implode(", ", $matches));
+                }
             }
         }
     }
