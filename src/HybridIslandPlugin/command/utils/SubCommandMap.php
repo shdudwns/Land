@@ -37,4 +37,8 @@ class SubCommandMap {
     public function getAllInfo(): array {
         return $this->subCommands;
     }
+
+    public function getAutoComplete(): string {
+        return implode(" ", $this->getAllNames());
+    }
 }
