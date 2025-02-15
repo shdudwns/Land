@@ -31,9 +31,9 @@ class WorldManager {
 
     public static function createWorld(string $generatorName, string $worldName): bool {
     $server = Server::getInstance();
-    $generatorClass = GeneratorManager::getInstance()->getGenerator($generatorName);
+    $generatorEntry = GeneratorManager::getInstance()->getGenerator($generatorName);
 
-    if ($generatorClass === null) {
+    if ($generatorEntry === null) {
         return false;
     }
 
@@ -42,8 +42,10 @@ class WorldManager {
         "preset" => ""  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
     ];
 
+    $generatorClass = $generatorEntry->getGeneratorClass(); // GeneratorManagerEntry에서 생성기 클래스 이름을 가져옴
+
     $worldCreationOptions = new WorldCreationOptions();
-    $worldCreationOptions->setGeneratorClass($generatorClass);
+    $worldCreationOptions->setGeneratorClass($generatorClass); // 문자열로 전달
     $worldCreationOptions->setGeneratorOptions($options);
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
