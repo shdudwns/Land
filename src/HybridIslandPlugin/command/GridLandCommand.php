@@ -5,47 +5,47 @@ namespace HybridIslandPlugin\command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use HybridIslandPlugin\world\SkyBlockManager;
+use HybridIslandPlugin\world\GridLandManager;
 use HybridIslandPlugin\command\utils\SubCommandMap;
 
-class SkyBlockCommand extends Command {
+class GridLandCommand extends Command {
 
     private SubCommandMap $subCommandMap;
 
     public function __construct() {
-        parent::__construct("skyblock", "SkyBlock 관리 명령어", "/skyblock <create|delete|home|info>", ["sb"]);
-        $this->setPermission("hybridislandplugin.command.skyblock");
+        parent::__construct("gridland", "GridLand 관리 명령어", "/gridland <create|delete|home|info>");
+        $this->setPermission("hybridislandplugin.command.gridland");
 
         // ✅ SubCommandMap 연동
         $this->subCommandMap = new SubCommandMap();
         $this->subCommandMap->registerSubCommand("create", function(Player $sender) {
-            SkyBlockManager::createSkyBlock($sender);
-        }, "SkyBlock 생성", "/skyblock create");
+            GridLandManager::createGridLand($sender);
+        }, "GridLand 생성", "/gridland create");
 
         $this->subCommandMap->registerSubCommand("delete", function(Player $sender) {
-            SkyBlockManager::deleteSkyBlock($sender);
-        }, "SkyBlock 삭제", "/skyblock delete");
+            GridLandManager::deleteGridLand($sender);
+        }, "GridLand 삭제", "/gridland delete");
 
         $this->subCommandMap->registerSubCommand("home", function(Player $sender) {
-            SkyBlockManager::teleportToSkyBlock($sender);
-        }, "SkyBlock으로 이동", "/skyblock home");
+            GridLandManager::teleportToGridLand($sender);
+        }, "GridLand로 이동", "/gridland home");
 
         $this->subCommandMap->registerSubCommand("info", function(Player $sender) {
-            $info = SkyBlockManager::getSkyBlockInfo($sender);
+            $info = GridLandManager::getGridLandInfo($sender);
             $sender->sendMessage($info);
-        }, "SkyBlock 정보 보기", "/skyblock info");
+        }, "GridLand 정보 보기", "/gridland info");
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
         if (!$sender instanceof Player) {
-            $sender->sendMessage("§c플레이어만 사용 가능합니다.");
+            $sender->sendMessage("게임 내에서만 사용 가능합니다.");
             return false;
         }
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
             foreach ($this->subCommandMap->getAllInfo() as $name => $info) {
-                $sender->sendMessage("§e/skyblock $name §7- " . $info["description"]);
+                $sender->sendMessage("§e/gridland $name §7- " . $info["description"]);
             }
             return false;
         }
