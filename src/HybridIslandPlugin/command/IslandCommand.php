@@ -85,4 +85,13 @@ class IslandCommand extends Command {
             ]
         ];
     }
+
+    public function onTabComplete(CommandSender $sender, Command $command, string $label, array $args): array {
+        if ($command->getName() === "island") {
+            if (count($args) === 1) {
+                return ["create", "delete"];
+            }
+        }
+        return [];
+    }
 }
