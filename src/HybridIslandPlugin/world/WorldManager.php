@@ -42,7 +42,7 @@ class WorldManager {
 
     // ✅ 최신 PocketMine-MP 5.x 방식으로 수정
     $options = [
-        "preset" => ""  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
+        "preset" => "island"  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
     ];
 
     // 배열을 JSON 문자열로 변환
@@ -50,7 +50,7 @@ class WorldManager {
 
     $worldCreationOptions = new WorldCreationOptions();
     $worldCreationOptions->setGeneratorClass($generatorClass); // 클래스 이름을 문자열로 전달
-    $worldCreationOptions->setGeneratorOptions($generatorName); // JSON 문자열로 전달
+    $worldCreationOptions->setGeneratorOptions($options); // JSON 문자열로 전달
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
 }
