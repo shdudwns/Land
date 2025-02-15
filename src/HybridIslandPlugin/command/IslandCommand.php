@@ -36,7 +36,7 @@ class IslandCommand extends Command {
     public function execute(CommandSender $sender, string $label, array $args): bool {
         if (!$sender instanceof Player) {
             $sender->sendMessage("§c플레이어만 사용 가능합니다.");
-            return false;
+            return true;
         }
 
         if (empty($args[0])) {
@@ -44,16 +44,16 @@ class IslandCommand extends Command {
             foreach ($this->subCommandMap->getAllNames() as $subCommand) {
                 $sender->sendMessage("§e/island $subCommand");
             }
-            return false;
+            return true;
         }
 
         $subCommand = strtolower($args[0]);
-        if (in_array($subCommand, $this->subCommandMap->getAllNames())) {
-            return $this->subCommandMap->executeSubCommand($subCommand, $sender);
+        if ($this->subCommandMap->executeSubCommand($subCommand, $sender)) {
+            return true;
         }
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
-        return false;
+        return true;
     }
 
     // ✅ 명령어 자동완성 미리보기
