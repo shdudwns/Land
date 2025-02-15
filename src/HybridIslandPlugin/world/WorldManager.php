@@ -38,9 +38,7 @@ class WorldManager {
     }
 
     $options = new GeneratorOptions([]); // ✅ GeneratorOptions 객체화
-    $worldCreationOptions = new WorldCreationOptions()
-        ->setGeneratorClass($generatorClass)
-        ->setGeneratorOptions($options); // ✅ 객체 전달
+    $worldCreationOptions = new WorldCreationOptions()->setGeneratorClass($generatorClass)->setGeneratorOptions($options); // ✅ 객체 전달
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
 }
