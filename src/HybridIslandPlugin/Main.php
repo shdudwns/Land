@@ -48,11 +48,8 @@ class Main extends PluginBase implements Listener {
         return preg_match('/^[a-zA-Z0-9_]+$/', $input) === 1;
     });
         // ✅ 명령어 등록
-        $this->getServer()->getCommandMap()->registerAll("HybridIslandPlugin", [
-            new IslandCommand(),
-            new GridLandCommand(),
-            new SkyBlockCommand()
-        ]);
+        $commandMap = $this->getServer()->getCommandMap();
+        $commandMap->register("island", new IslandCommand());
 
         // ✅ 이벤트 리스너 등록
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
