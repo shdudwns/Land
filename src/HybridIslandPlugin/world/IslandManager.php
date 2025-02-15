@@ -103,4 +103,8 @@ class IslandManager {
         }
         return "§c섬 정보가 없습니다.";
     }
+
+    public static function getAllIslands(): array {
+        return IslandConfig::getAllIslands();
+    }
 }
