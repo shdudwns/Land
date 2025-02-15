@@ -16,19 +16,18 @@ class WorldCreationOptionsManager {
         switch (strtolower($type)) {
             case "island":
                 $seed = mt_rand();
-                $options->setGeneratorClass(new IslandGenerator($seed));
-                //$options->setSpawnLocation(new Vector3(8, 65, 8));
+                $options->setGeneratorClass(IslandGenerator::class); // ✅ 클래스 이름(string)으로 수정
                 $options->setSeed($seed); // ✅ 랜덤 시드 적용
                 break;
 
             case "gridland":
-                $options->setGenerator(new GridLandGenerator());
+                $options->setGeneratorClass(GridLandGenerator::class); // ✅ 수정
                 $options->setSpawnLocation(new Vector3(0, 65, 0));
                 $options->setSeed(mt_rand());
                 break;
 
             case "skyblock":
-                $options->setGenerator(new SkyBlockGenerator());
+                $options->setGeneratorClass(SkyBlockGenerator::class); // ✅ 수정
                 $options->setSpawnLocation(new Vector3(8, 65, 8));
                 $options->setSeed(mt_rand());
                 break;
