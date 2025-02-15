@@ -11,7 +11,7 @@ use pocketmine\utils\Random;
 
 class IslandGenerator extends Generator {
 
-    public function __construct(int $seed, array $options = []) {
+    public function __construct(int $seed, string $options = "") {
         parent::__construct($seed, $options);
     }
 
