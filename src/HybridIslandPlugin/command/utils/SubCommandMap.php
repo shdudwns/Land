@@ -35,4 +35,14 @@ class SubCommandMap {
     public function getAutoComplete(): string {
         return implode(" ", $this->getAllNames());
     }
+
+    public function getAllInfo(): array {
+    $info = [];
+    foreach ($this->subCommands as $name => $data) {
+        $info[$name] = [
+            "description" => $data["description"]
+        ];
+    }
+    return $info;
+}
 }
