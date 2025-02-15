@@ -31,18 +31,21 @@ class IslandGenerator extends Generator {
         if ($chunkX == 0 && $chunkZ == 0) {
             for ($x = 0; $x <= 15; $x++) {
                 for ($z = 0; $z <= 15; $z++) {
-                    $chunk->setFullBlock($x, 64, $z, VanillaBlocks::GRASS()->getStateId());
-                    $chunk->setFullBlock($x, 63, $z, VanillaBlocks::DIRT()->getStateId());
-                    $chunk->setFullBlock($x, 62, $z, VanillaBlocks::DIRT()->getStateId());
-                    $chunk->setFullBlock($x, 61, $z, VanillaBlocks::STONE()->getStateId());
-                    $chunk->setFullBlock($x, 60, $z, VanillaBlocks::STONE()->getStateId());
+                    $chunk->setBlockStateId($x, 64, $z, VanillaBlocks::GRASS()->getStateId());
+                    $chunk->setBlockStateId($x, 63, $z, VanillaBlocks::DIRT()->getStateId());
+                    $chunk->setBlockStateId($x, 62, $z, VanillaBlocks::DIRT()->getStateId());
+                    $chunk->setBlockStateId($x, 61, $z, VanillaBlocks::STONE()->getStateId());
+                    $chunk->setBlockStateId($x, 60, $z, VanillaBlocks::STONE()->getStateId());
                 }
             }
         }
+
+        // ✅ 청크가 Dirty 상태가 아니라고 명시
+        $chunk->markDirty(false);
     }
 
     public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
-        // ✅ 섬 위에 나무 생성 (예시)
+        // ✅ 나무 생성 예시
         if ($chunkX == 0 && $chunkZ == 0) {
             $world->setBlockAt(8, 65, 8, VanillaBlocks::OAK_LOG());
             $world->setBlockAt(8, 66, 8, VanillaBlocks::OAK_LOG());
