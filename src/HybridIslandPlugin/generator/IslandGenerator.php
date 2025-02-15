@@ -41,7 +41,7 @@ class IslandGenerator extends Generator {
         }
 
         // ✅ 청크가 Dirty 상태가 아니라고 명시
-        $chunk->markDirty(false);
+        $world->setChunk($chunkX, $chunkZ, $chunk);
     }
 
     public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
