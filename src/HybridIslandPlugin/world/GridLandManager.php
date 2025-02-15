@@ -107,4 +107,21 @@ class GridLandManager {
         }
         return "§cGridLand 정보가 없습니다.";
     }
+
+    public static function isInsideGridLand(Vector3 $pos): bool {
+        $allIslands = GridLandConfig::getAllIslands();
+
+        foreach ($allIslands as $island) {
+            $location = $island["location"];
+            if (
+                $pos->x >= $location["startX"] &&
+                $pos->x <= $location["endX"] &&
+                $pos->z >= $location["startZ"] &&
+                $pos->z <= $location["endZ"]
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
