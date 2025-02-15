@@ -15,8 +15,8 @@ class WorldCreationOptionsManager {
         
         switch (strtolower($type)) {
             case "island":
-                $options->setGenerator(new IslandGenerator());
-                $options->setSpawnLocation(new Vector3(8, 65, 8));
+                $options->setGeneratorClass(new IslandGenerator());
+                //$options->setSpawnLocation(new Vector3(8, 65, 8));
                 $options->setSeed(mt_rand()); // ✅ 랜덤 시드 적용
                 break;
 
