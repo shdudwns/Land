@@ -4,7 +4,6 @@ namespace HybridIslandPlugin\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
@@ -43,21 +42,22 @@ class IslandCommand extends Command {
 
         if (empty($args[0])) {
             $sender->sendMessage("§a사용 가능한 명령어:");
-            foreach ($this->subCommandMap->getAllNames() as $subCommand) {
+            foreach ($this->subCommandMap->getAll() as $subCommand) {
                 $sender->sendMessage("§e/island $subCommand");
             }
             return false;
         }
 
-        if ($this->subCommandMap->executeSubCommand(strtolower($args[0]), $sender)) {
-            return true;
+        $subCommand = strtolower($args[0]);
+        if (in_array($subCommand, $this->subCommandMap->getAll())) {
+            return $this->subCommandMap->executeSubCommand($subCommand, $sender);
         }
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
         return false;
     }
 
-    // ✅ 자동완성 미리보기
+    // ✅ 명령어 자동완성 미리보기
     public function getAliases(): array {
         return ["isl"];
     }
