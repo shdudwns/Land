@@ -69,4 +69,8 @@ class IslandCommand extends Command {
             ]
         ];
     }
+
+    public function getUsage(): string {
+        return "/island <" . $this->subCommandManager->getAutoComplete() . ">";
+    }
 }
