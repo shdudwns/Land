@@ -8,6 +8,7 @@ use pocketmine\math\Vector3;
 use pocketmine\world\generator\Generator;
 use pocketmine\block\Block;
 use pocketmine\utils\Random;
+use pocketmine\world\generator\GeneratorOptions;
 
 class IslandGenerator extends Generator {
 
@@ -20,7 +21,7 @@ class IslandGenerator extends Generator {
     }
 
     public function getSettings(): array {
-        return [];
+        return (new GeneratorOptions([]))->toArray(); // ✅ GeneratorOptions 사용
     }
 
     public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
