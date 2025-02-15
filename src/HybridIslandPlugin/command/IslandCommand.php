@@ -56,7 +56,7 @@ class IslandCommand extends Command {
 
         $subCommand = strtolower($args[0]);
         if (in_array($subCommand, $this->subCommandMap->getAllNames())) {
-            return $this->subCommandMap->executeSubCommand($subCommand, $sender);
+            return $this->subCommandMap->executeSubCommand($subCommand, $sender, $args);
         }
 
         $sender->sendMessage("§c잘못된 명령어입니다.");
