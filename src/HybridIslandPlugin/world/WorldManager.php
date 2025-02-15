@@ -45,7 +45,7 @@ class WorldManager {
         "preset" => "island"  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
     ];
 
-    // ✅ 배열을 JSON 문자열로 변환
+    // 배열을 JSON 문자열로 변환
     $optionsString = json_encode($options);
 
     $worldCreationOptions = new WorldCreationOptions();
