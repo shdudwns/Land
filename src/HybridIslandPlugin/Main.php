@@ -34,7 +34,12 @@ class Main extends PluginBase implements Listener {
         $generatorManager = GeneratorManager::getInstance();
 
     // ✅ IslandGenerator 등록
-    $generatorManager->addGenerator(IslandGenerator::class, "island", true);
+    $generatorManager->addGenerator(IslandGenerator::class, "island", 
+    function(string $preset): bool {
+        // ✅ 문자, 숫자, 언더스코어만 허용
+        return preg_match('/^[a-zA-Z0-9_]*$/', $preset) === 1;
+    }
+);
 
     // ✅ GridLandGenerator 등록
     $generatorManager->addGenerator(GridLandGenerator::class, "gridland", function(string $input): bool {
