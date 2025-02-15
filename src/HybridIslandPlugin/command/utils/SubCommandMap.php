@@ -2,42 +2,36 @@
 
 namespace HybridIslandPlugin\command\utils;
 
-use Closure;
 use pocketmine\player\Player;
+use pocketmine\command\CommandSender;
 
-class SubCommandMap {
-
+class SubCommandManager {
     private array $subCommands = [];
 
     // ✅ 서브 명령어 등록
-    public function registerSubCommand(string $name, Closure $callback, string $description, string $usage): void {
+    public function registerSubCommand(string $name, callable $callback, string $description): void {
         $this->subCommands[$name] = [
             "callback" => $callback,
-            "description" => $description,
-            "usage" => $usage
+            "description" => $description
         ];
     }
 
     // ✅ 서브 명령어 실행
-    public function executeSubCommand(string $name, Player $sender): bool {
+    public function executeSubCommand(string $name, CommandSender $sender, array $args): bool {
         if (isset($this->subCommands[$name])) {
             $callback = $this->subCommands[$name]["callback"];
-            $callback($sender);
+            $callback($sender, $args);
             return true;
         }
         return false;
     }
 
-    // ✅ 모든 서브 명령어 이름 반환
+    // ✅ 서브 명령어 이름 리스트 반환
     public function getAllNames(): array {
         return array_keys($this->subCommands);
     }
 
-    // ✅ 서브 명령어 설명 및 사용법 가져오기
-    public function getAllInfo(): array {
-        return $this->subCommands;
-    }
-
+    // ✅ 자동완성용 문자열 반환
     public function getAutoComplete(): string {
         return implode(" ", $this->getAllNames());
     }
