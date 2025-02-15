@@ -8,6 +8,7 @@ use pocketmine\player\Player;
 use HybridIslandPlugin\world\IslandManager;
 use HybridIslandPlugin\Main;
 use HybridIslandPlugin\command\utils\SubCommandMap;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 
 class IslandCommand extends Command {
 
@@ -93,5 +94,27 @@ class IslandCommand extends Command {
             }
         }
         return [];
+    }
+
+    public function onPlayerCommandPreprocess(PlayerCommandPreprocessEvent $event) {
+        $message = $event->getMessage();
+        $player = $event->getPlayer();
+
+        // 명령어가 /island로 시작하는 경우
+        if (strpos($message, "/island") === 0) {
+            $args = explode(" ", $message);
+            if (count($args) === 2) {
+                // 사용자가 /island + 입력하는 경우
+                $subCommand = strtolower($args[1]);
+                if (strpos($subCommand, "c") === 0) {
+                    $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: /island create");
+                } elseif (strpos($subCommand, "d") === 0) {
+                    $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: /island delete");
+                }
+            } elseif (count($args) === 1) {
+                // /island 만 입력했을 때
+                $player->sendMessage(TextFormat::YELLOW . "가능한 명령어: create, delete");
+            }
+        }
     }
 }
