@@ -33,4 +33,8 @@ class IslandConfig {
         self::getInstance()->removeNested("islands.$playerName");
         self::getInstance()->save();
     }
+
+    public static function getAllIslands(): array {
+        return self::$config->get("islands", []);
+    }
 }
