@@ -84,15 +84,19 @@ class IslandCommand extends Command implements Listener {
 
     // ✅ 플레이어 명령어 실시간 감지
     public function onPlayerCommandPreprocess(PlayerCommandPreprocessEvent $event): void {
-        $message = $event->getMessage();
-        if (str_starts_with($message, "/island ")) {
-            $args = explode(" ", substr($message, 8));
-            if (count($args) === 1) {
-                $matches = $this->parameter->getAutoComplete($args[0]);
-                if (!empty($matches)) {
-                    $event->getPlayer()->sendMessage("§7사용 가능한 서브 명령어: §e" . implode(", ", $matches));
-                }
+    $message = $event->getMessage();
+    if (str_starts_with($message, "/island ")) {
+        $args = explode(" ", substr($message, 8));
+        if (count($args) === 1) {
+            $input = $args[0];
+            $matches = array_filter($this->subCommandMap->getAllNames(), function ($name) use ($input) {
+                return str_starts_with($name, $input);
+            });
+
+            if (!empty($matches)) {
+                $event->getPlayer()->sendMessage("§7사용 가능한 서브 명령어: §e" . implode(", ", $matches));
             }
         }
     }
+}
 }
