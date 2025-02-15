@@ -68,9 +68,14 @@ class WorldManager {
 
     $world = $worldManager->getWorldByName($worldName);
 
+    // ✅ ChunkLockId 사용하여 청크 고정
+    $lockId = $world->lockChunk(0, 0);
+
     // ✅ 청크 강제 로드 및 상태 확인
     $world->loadChunk(0, 0);
+    $world->orderChunkPopulation(0, 0);
 
+    // ✅ 청크 상태가 변경될 때까지 대기
     $attempts = 0;
     while ((!$world->isChunkGenerated(0, 0) || !$world->isChunkPopulated(0, 0)) && $attempts < 15) {
         $isGenerated = $world->isChunkGenerated(0, 0) ? "true" : "false";
@@ -79,6 +84,9 @@ class WorldManager {
         $attempts++;
         sleep(1);
     }
+
+    // ✅ ChunkLockId 해제
+    $world->unlockChunk(0, 0, $lockId);
 
     if ($world->isChunkGenerated(0, 0) && $world->isChunkPopulated(0, 0)) {
         $player->teleport($world->getSafeSpawn());
