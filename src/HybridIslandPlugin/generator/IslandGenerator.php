@@ -25,29 +25,33 @@ class IslandGenerator extends Generator {
 }
 
     public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
-        // ✅ 청크 가져오기
         $chunk = $world->getChunk($chunkX, $chunkZ);
 
-        // ✅ 스폰 청크일 때만 섬 생성
+        // ✅ (0, 0) 청크에 섬 생성
         if ($chunkX == 0 && $chunkZ == 0) {
             for ($x = 0; $x <= 15; $x++) {
                 for ($z = 0; $z <= 15; $z++) {
-                    $chunk->setBlock($x, 64, $z, VanillaBlocks::GRASS()->getStateId());
-                    $chunk->setBlock($x, 63, $z, VanillaBlocks::DIRT()->getStateId());
-                    $chunk->setBlock($x, 62, $z, VanillaBlocks::DIRT()->getStateId());
-                    $chunk->setBlock($x, 61, $z, VanillaBlocks::STONE()->getStateId());
-                    $chunk->setBlock($x, 60, $z, VanillaBlocks::STONE()->getStateId());
+                    $chunk->setFullBlock($x, 64, $z, VanillaBlocks::GRASS()->getStateId());
+                    $chunk->setFullBlock($x, 63, $z, VanillaBlocks::DIRT()->getStateId());
+                    $chunk->setFullBlock($x, 62, $z, VanillaBlocks::DIRT()->getStateId());
+                    $chunk->setFullBlock($x, 61, $z, VanillaBlocks::STONE()->getStateId());
+                    $chunk->setFullBlock($x, 60, $z, VanillaBlocks::STONE()->getStateId());
                 }
             }
         }
-
-        $chunk->setTerrainDirty(); 
-        // ✅ PocketMine-MP에 청크 저장
-        $world->setChunk($chunkX, $chunkZ, $chunk);
     }
 
     public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
-        // 나무 등 추가 생성 가능
+        // ✅ 섬 위에 나무 생성 (예시)
+        if ($chunkX == 0 && $chunkZ == 0) {
+            $world->setBlockAt(8, 65, 8, VanillaBlocks::OAK_LOG());
+            $world->setBlockAt(8, 66, 8, VanillaBlocks::OAK_LOG());
+            $world->setBlockAt(8, 67, 8, VanillaBlocks::OAK_LEAVES());
+            $world->setBlockAt(7, 67, 8, VanillaBlocks::OAK_LEAVES());
+            $world->setBlockAt(9, 67, 8, VanillaBlocks::OAK_LEAVES());
+            $world->setBlockAt(8, 67, 7, VanillaBlocks::OAK_LEAVES());
+            $world->setBlockAt(8, 67, 9, VanillaBlocks::OAK_LEAVES());
+        }
     }
 
     public function getSpawn(): Vector3 {
