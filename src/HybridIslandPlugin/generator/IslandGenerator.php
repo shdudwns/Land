@@ -25,19 +25,24 @@ class IslandGenerator extends Generator {
 }
 
     public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
+        // ✅ 청크 가져오기
         $chunk = $world->getChunk($chunkX, $chunkZ);
+
+        // ✅ 스폰 청크일 때만 섬 생성
         if ($chunkX == 0 && $chunkZ == 0) {
             for ($x = 0; $x <= 15; $x++) {
                 for ($z = 0; $z <= 15; $z++) {
-                    $chunk->setBlock($x, 64, $z, Block::GRASS);
-                    $chunk->setBlock($x, 63, $z, Block::DIRT);
-                    $chunk->setBlock($x, 62, $z, Block::DIRT);
-                    $chunk->setBlock($x, 61, $z, Block::STONE);
-                    $chunk->setBlock($x, 60, $z, Block::STONE);
+                    $chunk->setBlock($x, 64, $z, VanillaBlocks::GRASS()->getStateId());
+                    $chunk->setBlock($x, 63, $z, VanillaBlocks::DIRT()->getStateId());
+                    $chunk->setBlock($x, 62, $z, VanillaBlocks::DIRT()->getStateId());
+                    $chunk->setBlock($x, 61, $z, VanillaBlocks::STONE()->getStateId());
+                    $chunk->setBlock($x, 60, $z, VanillaBlocks::STONE()->getStateId());
                 }
             }
         }
-        $world->setChunk($chunkX, $chunkZ, $chunk);
+
+        // ✅ 청크를 생성 완료 상태로 설정
+        $chunk->setGenerated();
     }
 
     public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
