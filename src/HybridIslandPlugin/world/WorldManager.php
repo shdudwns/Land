@@ -46,8 +46,8 @@ class WorldManager {
     ];
 
     $worldCreationOptions = new WorldCreationOptions();
-    $worldCreationOptions->setGeneratorClass($generatorClass); // 이제 클래스 이름을 문자열로 전달
-    $worldCreationOptions->setGeneratorOptions($options);
+    $worldCreationOptions->setGeneratorClass(); // 이제 클래스 이름을 문자열로 전달
+    $worldCreationOptions->validateGeneratorOptions($options);
 
     return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
 }
