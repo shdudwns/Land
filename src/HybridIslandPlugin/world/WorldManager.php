@@ -83,7 +83,7 @@ class WorldManager {
 
     // ✅ 청크 강제 로드 및 상태 확인
     $world->loadChunk($chunkX, $chunkZ, $lockId);
-    $world->orderChunkPopulation($chunkX, $chunkZ);
+    $world->orderChunkPopulation($chunkX, $chunkZ, $lockId);
 
     // ✅ 청크 상태가 변경될 때까지 대기
     $attempts = 0;
