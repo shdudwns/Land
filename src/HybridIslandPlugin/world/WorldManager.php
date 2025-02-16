@@ -67,28 +67,39 @@ class WorldManager {
     }
 
     $world = $worldManager->getWorldByName($worldName);
+    $chunkX = 0;
+    $chunkZ = 0;
 
-    // ✅ ChunkLockId 사용하여 청크 고정
-    $lockId = $world->lockChunk(0, 0);
+    // ✅ ChunkLockId 생성
+    $lockId = new \pocketmine\world\ChunkLockId();
+
+    try {
+        // ✅ ChunkLock 시도
+        $world->lockChunk($chunkX, $chunkZ, $lockId);
+    } catch (\InvalidArgumentException $e) {
+        $player->sendMessage("§c청크가 이미 잠겨 있습니다. 다른 작업이 진행 중일 수 있습니다.");
+        return false;
+    }
 
     // ✅ 청크 강제 로드 및 상태 확인
-    $world->loadChunk(0, 0);
-    $world->orderChunkPopulation(0, 0);
+    $world->loadChunk($chunkX, $chunkZ, $lockId);
+    $world->orderChunkPopulation($chunkX, $chunkZ);
 
     // ✅ 청크 상태가 변경될 때까지 대기
     $attempts = 0;
-    while ((!$world->isChunkGenerated(0, 0) || !$world->isChunkPopulated(0, 0)) && $attempts < 15) {
-        $isGenerated = $world->isChunkGenerated(0, 0) ? "true" : "false";
-        $isPopulated = $world->isChunkPopulated(0, 0) ? "true" : "false";
+    while ((!$world->isChunkGenerated($chunkX, $chunkZ) || !$world->isChunkPopulated($chunkX, $chunkZ)) && $attempts < 15) {
+        $isGenerated = $world->isChunkGenerated($chunkX, $chunkZ) ? "true" : "false";
+        $isPopulated = $world->isChunkPopulated($chunkX, $chunkZ) ? "true" : "false";
         $player->sendMessage("§e[디버그] 청크 상태 확인 중... (시도: $attempts) Generated: $isGenerated, Populated: $isPopulated");
         $attempts++;
         sleep(1);
     }
 
     // ✅ ChunkLockId 해제
-    $world->unlockChunk(0, 0, $lockId);
+    $world->unlockChunk($chunkX, $chunkZ, $lockId);
 
-    if ($world->isChunkGenerated(0, 0) && $world->isChunkPopulated(0, 0)) {
+    // ✅ 최종 상태 확인 및 텔레포트
+    if ($world->isChunkGenerated($chunkX, $chunkZ) && $world->isChunkPopulated($chunkX, $chunkZ)) {
         $player->teleport($world->getSafeSpawn());
         $player->sendMessage("§a섬으로 이동했습니다!");
         return true;
