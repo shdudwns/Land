@@ -30,22 +30,41 @@ class WorldManager {
         }
     }
 
-    public static function createWorld(string $type, string $worldName): bool {
-        $server = Server::getInstance();
-        $worldManager = $server->getWorldManager();
+   public static function createWorld(string $type, string $worldName): bool {
+    $server = Server::getInstance();
+    $worldManager = $server->getWorldManager();
 
-        if ($worldManager->isWorldGenerated($worldName)) {
-            return false; // 이미 존재하는 월드
-        }
-
-        try {
-            $options = WorldCreationOptionsManager::getOptions($type);
-            $worldManager->generateWorld($worldName, $options);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+    if ($worldManager->isWorldGenerated($worldName)) {
+        return false; // 이미 존재하는 월드
     }
+
+    try {
+        $options = WorldCreationOptionsManager::getOptions($type);
+        $worldManager->generateWorld($worldName, $options);
+        
+        // ✅ 월드 로드 후 스폰 위치 설정
+        if ($worldManager->loadWorld($worldName)) {
+            $world = $worldManager->getWorldByName($worldName);
+            if ($world !== null) {
+                switch (strtolower($type)) {
+                    case "island":
+                        $world->setSpawnLocation(new Vector3(8, 65, 8));
+                        break;
+                    case "gridland":
+                        $world->setSpawnLocation(new Vector3(0, 65, 0));
+                        break;
+                    case "skyblock":
+                        $world->setSpawnLocation(new Vector3(8, 65, 8));
+                        break;
+                }
+            }
+        }
+        return true;
+    } catch (\Exception $e) {
+        return false;
+    }
+}
+
 
     public static function teleportToWorld(Player $player, string $worldName): bool {
         $worldManager = Server::getInstance()->getWorldManager();
