@@ -9,6 +9,7 @@ use HybridIslandPlugin\config\ConfigManager;
 use pocketmine\world\WorldCreationOptions;
 use pocketmine\world\generator\GeneratorManager;
 use HybridIslandPlugin\world\WorldCreationOptionsManager;
+use pocketmine\math\Vector3;
 
 class WorldManager {
 
