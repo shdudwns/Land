@@ -16,14 +16,17 @@ class WorldCreationOptionsManager {
         switch (strtolower($type)) {
             case "island":
                 $options->setGeneratorClass(IslandGenerator::class);
+                $options->setGeneratorOptions(json_encode(["preset" => "island"])); // ✅ preset 추가
                 break;
 
             case "gridland":
                 $options->setGeneratorClass(GridLandGenerator::class);
+                $options->setGeneratorOptions(json_encode(["preset" => "gridland"])); // ✅ preset 추가
                 break;
 
             case "skyblock":
                 $options->setGeneratorClass(SkyBlockGenerator::class);
+                $options->setGeneratorOptions(json_encode(["preset" => "skyblock"])); // ✅ preset 추가
                 break;
 
             default:
