@@ -8,113 +8,87 @@ use pocketmine\Server;
 use HybridIslandPlugin\config\ConfigManager;
 use pocketmine\world\WorldCreationOptions;
 use pocketmine\world\generator\GeneratorManager;
-use pocketmine\world\generator\GeneratorOptions;
+use HybridIslandPlugin\world\WorldCreationOptionsManager;
 
 class WorldManager {
 
     public static function init(): void {
-        self::loadWorlds("islandData", "island");
-        self::loadWorlds("gridLandData", "gridland");
-        self::loadWorlds("skyBlockData", "skyblock");
+        self::loadWorlds("islandData");
+        self::loadWorlds("gridLandData");
+        self::loadWorlds("skyBlockData");
     }
 
-    private static function loadWorlds(string $dataFile, string $type): void {
+    private static function loadWorlds(string $dataFile): void {
         $config = ConfigManager::getConfig($dataFile);
         $worlds = $config->getAll();
 
         foreach ($worlds as $worldName => $data) {
-            if (!Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
-                Server::getInstance()->getWorldManager()->loadWorld($worldName);
+            $worldManager = Server::getInstance()->getWorldManager();
+            if (!$worldManager->isWorldLoaded($worldName)) {
+                $worldManager->loadWorld($worldName);
             }
         }
     }
 
-    public static function createWorld(string $generatorName, string $worldName): bool {
-    $server = Server::getInstance();
-    $generatorEntry = GeneratorManager::getInstance()->getGenerator($generatorName);
+    public static function createWorld(string $type, string $worldName): bool {
+        $server = Server::getInstance();
+        $worldManager = $server->getWorldManager();
 
-    if ($generatorEntry === null) {
-        return false;
-    }
+        if ($worldManager->isWorldGenerated($worldName)) {
+            return false; // 이미 존재하는 월드
+        }
 
-    // ✅ GeneratorEntry에서 클래스 이름을 가져옴
-    $generatorClass = $generatorEntry->getGeneratorClass(); 
-
-    // ✅ 최신 PocketMine-MP 5.x 방식으로 수정
-    $options = [
-        "preset" => "island"  // 생성기 설정에 필요한 옵션을 배열 형태로 정의
-    ];
-
-    // 배열을 JSON 문자열로 변환
-    $optionsString = json_encode($options);
-
-    $worldCreationOptions = new WorldCreationOptions();
-    $worldCreationOptions->setGeneratorClass($generatorClass); // 클래스 이름을 문자열로 전달
-    $worldCreationOptions->setGeneratorOptions($optionsString); // JSON 문자열로 전달
-
-    return $server->getWorldManager()->generateWorld($worldName, $worldCreationOptions);
-}
-    
-    public static function teleportToWorld(Player $player, string $worldName): bool {
-    $worldManager = Server::getInstance()->getWorldManager();
-
-    // ✅ 월드가 로드되지 않은 경우 로드
-    if (!$worldManager->isWorldLoaded($worldName)) {
-        if (!$worldManager->loadWorld($worldName)) {
-            $player->sendMessage("§c월드 로드에 실패했습니다.");
+        try {
+            $options = WorldCreationOptionsManager::getOptions($type);
+            $worldManager->generateWorld($worldName, $options);
+            return true;
+        } catch (\Exception $e) {
             return false;
         }
     }
 
-    $world = $worldManager->getWorldByName($worldName);
-    $chunkX = 0;
-    $chunkZ = 0;
+    public static function teleportToWorld(Player $player, string $worldName): bool {
+        $worldManager = Server::getInstance()->getWorldManager();
 
-    // ✅ ChunkLockId 생성
-    $lockId = new \pocketmine\world\ChunkLockId();
+        if (!$worldManager->isWorldLoaded($worldName)) {
+            if (!$worldManager->loadWorld($worldName)) {
+                $player->sendMessage("§c월드 로드에 실패했습니다.");
+                return false;
+            }
+        }
 
-    try {
-        // ✅ ChunkLock 시도
-        $world->lockChunk($chunkX, $chunkZ, $lockId);
-    } catch (\InvalidArgumentException $e) {
-        $player->sendMessage("§c청크가 이미 잠겨 있습니다. 다른 작업이 진행 중일 수 있습니다.");
-        return false;
-    }
+        $world = $worldManager->getWorldByName($worldName);
+        if ($world === null) {
+            $player->sendMessage("§c월드를 찾을 수 없습니다.");
+            return false;
+        }
 
-    // ✅ 청크 강제 로드 및 상태 확인
-    $world->loadChunk($chunkX, $chunkZ, $lockId);
-    $world->orderChunkPopulation($chunkX, $chunkZ, $lockId);
+        // ✅ 청크 로드 요청 (비동기 처리 가능)
+        $chunkX = 0;
+        $chunkZ = 0;
+        $world->loadChunk($chunkX, $chunkZ);
+        $world->orderChunkPopulation($chunkX, $chunkZ);
 
-    // ✅ 청크 상태가 변경될 때까지 대기
-    $attempts = 0;
-    while ((!$world->isChunkGenerated($chunkX, $chunkZ) || !$world->isChunkPopulated($chunkX, $chunkZ)) && $attempts < 15) {
-        $isGenerated = $world->isChunkGenerated($chunkX, $chunkZ) ? "true" : "false";
-        $isPopulated = $world->isChunkPopulated($chunkX, $chunkZ) ? "true" : "false";
-        $player->sendMessage("§e[디버그] 청크 상태 확인 중... (시도: $attempts) Generated: $isGenerated, Populated: $isPopulated");
-        $attempts++;
-        sleep(1);
-    }
+        if (!$world->isChunkGenerated($chunkX, $chunkZ) || !$world->isChunkPopulated($chunkX, $chunkZ)) {
+            $player->sendMessage("§c청크가 완전히 생성되지 않았습니다.");
+            return false;
+        }
 
-    // ✅ ChunkLockId 해제
-    $world->unlockChunk($chunkX, $chunkZ, $lockId);
-
-    // ✅ 최종 상태 확인 및 텔레포트
-    if ($world->isChunkGenerated($chunkX, $chunkZ) && $world->isChunkPopulated($chunkX, $chunkZ)) {
         $player->teleport($world->getSafeSpawn());
         $player->sendMessage("§a섬으로 이동했습니다!");
         return true;
-    } else {
-        $player->sendMessage("§c청크가 완전히 생성되지 않았습니다.");
-        return false;
     }
-}
 
     public static function deleteWorld(string $worldName): bool {
-        if (Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
-            Server::getInstance()->getWorldManager()->unloadWorld(
-                Server::getInstance()->getWorldManager()->getWorldByName($worldName)
-            );
+        $worldManager = Server::getInstance()->getWorldManager();
+
+        if ($worldManager->isWorldLoaded($worldName)) {
+            $world = $worldManager->getWorldByName($worldName);
+            if ($world !== null) {
+                $worldManager->unloadWorld($world);
+            }
         }
+
         $worldPath = Server::getInstance()->getDataPath() . "worlds/" . $worldName;
         if (is_dir($worldPath)) {
             self::deleteDirectory($worldPath);
@@ -124,11 +98,13 @@ class WorldManager {
     }
 
     private static function deleteDirectory(string $dir): void {
-        $files = scandir($dir);
+        $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            if ($file !== "." && $file !== "..") {
-                $path = $dir . "/" . $file;
-                is_dir($path) ? self::deleteDirectory($path) : unlink($path);
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($path)) {
+                self::deleteDirectory($path);
+            } else {
+                @unlink($path); // 파일 삭제 오류 방지
             }
         }
         rmdir($dir);
