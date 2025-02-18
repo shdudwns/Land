@@ -3,17 +3,16 @@
 namespace HybridIslandPlugin\generator;
 
 use pocketmine\world\ChunkManager;
-use pocketmine\world\World;
 use pocketmine\math\Vector3;
 use pocketmine\world\generator\Generator;
-use pocketmine\block\Block;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\utils\Random;
 use pocketmine\world\generator\GeneratorOptions;
 
 class IslandGenerator extends Generator {
 
-    public function __construct(int $seed, string $options = "") {
-        parent::__construct($seed, $options);
+    public function __construct(GeneratorOptions $options) {
+        parent::__construct($options);
     }
 
     public function getName(): string {
@@ -21,31 +20,26 @@ class IslandGenerator extends Generator {
     }
 
     public function getSettings(): array {
-    return ["preset" => "island"];
-}
+        return ["preset" => "island"];
+    }
 
     public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
-        $chunk = $world->getChunk($chunkX, $chunkZ);
-
-        // ✅ (0, 0) 청크에 섬 생성
+        // (0, 0) 청크에 섬 생성
         if ($chunkX == 0 && $chunkZ == 0) {
             for ($x = 0; $x <= 15; $x++) {
                 for ($z = 0; $z <= 15; $z++) {
-                    $chunk->setBlockStateId($x, 64, $z, VanillaBlocks::GRASS()->getStateId());
-                    $chunk->setBlockStateId($x, 63, $z, VanillaBlocks::DIRT()->getStateId());
-                    $chunk->setBlockStateId($x, 62, $z, VanillaBlocks::DIRT()->getStateId());
-                    $chunk->setBlockStateId($x, 61, $z, VanillaBlocks::STONE()->getStateId());
-                    $chunk->setBlockStateId($x, 60, $z, VanillaBlocks::STONE()->getStateId());
+                    $world->setBlockStateId($chunkX * 16 + $x, 64, $chunkZ * 16 + $z, VanillaBlocks::GRASS()->getStateId());
+                    $world->setBlockStateId($chunkX * 16 + $x, 63, $chunkZ * 16 + $z, VanillaBlocks::DIRT()->getStateId());
+                    $world->setBlockStateId($chunkX * 16 + $x, 62, $chunkZ * 16 + $z, VanillaBlocks::DIRT()->getStateId());
+                    $world->setBlockStateId($chunkX * 16 + $x, 61, $chunkZ * 16 + $z, VanillaBlocks::STONE()->getStateId());
+                    $world->setBlockStateId($chunkX * 16 + $x, 60, $chunkZ * 16 + $z, VanillaBlocks::STONE()->getStateId());
                 }
             }
         }
-
-        // ✅ 청크가 Dirty 상태가 아니라고 명시
-        $world->setChunk($chunkX, $chunkZ, $chunk);
     }
 
     public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
-        // ✅ 나무 생성 예시
+        // 나무 생성 예시
         if ($chunkX == 0 && $chunkZ == 0) {
             $world->setBlockAt(8, 65, 8, VanillaBlocks::OAK_LOG());
             $world->setBlockAt(8, 66, 8, VanillaBlocks::OAK_LOG());
