@@ -31,40 +31,67 @@ class WorldManager {
         }
     }
 
-   public static function createWorld(string $type, string $worldName): bool {
-    $server = Server::getInstance();
-    $worldManager = $server->getWorldManager();
+    public static function createWorld(string $type, string $worldName): bool {
+        $server = Server::getInstance();
+        $worldManager = $server->getWorldManager();
 
-    if ($worldManager->isWorldGenerated($worldName)) {
-        return false; // 이미 존재하는 월드
-    }
-
-    try {
-        $options = WorldCreationOptionsManager::getOptions($type);
-        $worldManager->generateWorld($worldName, $options);
-        
-        // ✅ 월드 로드 후 스폰 위치 설정
-        if ($worldManager->loadWorld($worldName)) {
-            $world = $worldManager->getWorldByName($worldName);
-            if ($world !== null) {
-                switch (strtolower($type)) {
-                    case "island":
-                        $world->setSpawnLocation(new Vector3(8, 65, 8));
-                        break;
-                    case "gridland":
-                        $world->setSpawnLocation(new Vector3(0, 65, 0));
-                        break;
-                    case "skyblock":
-                        $world->setSpawnLocation(new Vector3(8, 65, 8));
-                        break;
-                }
-            }
+        if ($worldManager->isWorldGenerated($worldName)) {
+            Server::getInstance()->getLogger()->warning("월드 [$worldName] 는 이미 존재합니다.");
+            return false;
         }
-        return true;
-    } catch (\Exception $e) {
-        return false;
+
+        try {
+            $options = WorldCreationOptionsManager::getOptions($type);
+            $worldManager->generateWorld($worldName, $options);
+
+            // ✅ 월드 생성 완료 대기 (최대 10초)
+            $attempts = 0;
+            while (!$worldManager->isWorldGenerated($worldName) && $attempts < 10) { 
+                Server::getInstance()->getLogger()->info("월드 [$worldName] 생성 중... ($attempts/10)");
+                sleep(1); // 1초 대기
+                $attempts++;
+            }
+
+            // ✅ 월드가 정상적으로 생성되었는지 확인
+            if (!$worldManager->isWorldGenerated($worldName)) {
+                Server::getInstance()->getLogger()->error("월드 [$worldName] 생성 실패! 원인을 확인하세요.");
+                return false;
+            }
+
+            // ✅ 월드 로드
+            if (!$worldManager->loadWorld($worldName)) {
+                Server::getInstance()->getLogger()->error("월드 [$worldName] 로드 실패!");
+                return false;
+            }
+
+            // ✅ 월드가 정상적으로 로드되었는지 확인
+            $world = $worldManager->getWorldByName($worldName);
+            if ($world === null) {
+                Server::getInstance()->getLogger()->error("월드 [$worldName] 를 찾을 수 없습니다.");
+                return false;
+            }
+
+            // ✅ 생성된 월드의 스폰 위치 설정
+            switch (strtolower($type)) {
+                case "island":
+                    $world->setSpawnLocation(new Vector3(8, 65, 8));
+                    break;
+                case "gridland":
+                    $world->setSpawnLocation(new Vector3(0, 65, 0));
+                    break;
+                case "skyblock":
+                    $world->setSpawnLocation(new Vector3(8, 65, 8));
+                    break;
+            }
+
+            Server::getInstance()->getLogger()->info("월드 [$worldName] 생성 및 로드 성공!");
+            return true;
+
+        } catch (\Exception $e) {
+            Server::getInstance()->getLogger()->error("월드 [$worldName] 생성 중 오류 발생: " . $e->getMessage());
+            return false;
+        }
     }
-}
 
 
     public static function teleportToWorld(Player $player, string $worldName): bool {
