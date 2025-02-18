@@ -4,8 +4,6 @@ namespace HybridIslandPlugin\world;
 
 use pocketmine\player\Player;
 use pocketmine\math\Vector3;
-use pocketmine\Server;
-use pocketmine\world\World;
 use HybridIslandPlugin\config\IslandConfig;
 use HybridIslandPlugin\world\WorldManager;
 
@@ -13,7 +11,8 @@ class IslandManager {
 
     // ✅ 플레이어가 섬을 가지고 있는지 확인
     public static function hasIsland(Player $player): bool {
-        return IslandConfig::getIsland($player->getName()) !== null;
+        $data = IslandConfig::getIsland($player->getName());
+        return $data !== null;
     }
 
     // ✅ 섬 생성
@@ -36,17 +35,8 @@ class IslandManager {
             ]
         ];
 
-        // ✅ PocketMine 5.x 방식으로 월드 생성
-        $worldManager = Server::getInstance()->getWorldManager();
-
-        if (!$worldManager->isWorldGenerated($worldName)) {
-            $worldManager->generateWorld($worldName,  // 월드 이름
-                0, // 시드 (랜덤)
-                WorldManager::getIslandGenerator() // 커스텀 섬 생성기
-            );
-        }
-
-        if ($worldManager->loadWorld($worldName)) {
+        // ✅ World 생성
+        if (WorldManager::createWorld("island", $worldName)) {
             IslandConfig::setIsland($player->getName(), $islandData);
             $player->sendMessage("§a섬이 성공적으로 생성되었습니다!");
             self::teleportToIsland($player); // ✅ 생성 후 바로 이동
@@ -55,21 +45,21 @@ class IslandManager {
         }
     }
 
-    // ✅ 섬 내부인지 확인
     public static function isInsideIsland(Vector3 $pos): bool {
-        foreach (IslandConfig::getAllIslands() as $island) {
-            $startX = $island["location"]["x"];
-            $startZ = $island["location"]["z"];
-            $size = $island["size"] ?? 100;
+    // 섬 영역 정보를 가져와서 확인
+    foreach (self::getAllIslands() as $island) {
+        $startX = $island["location"]["x"];
+        $startZ = $island["location"]["z"];
+        $size = $island["size"] ?? 100;
 
-            if ($pos->getX() >= $startX && $pos->getX() <= $startX + $size &&
-                $pos->getZ() >= $startZ && $pos->getZ() <= $startZ + $size) {
-                return true;
-            }
+        if ($pos->getX() >= $startX && $pos->getX() <= $startX + $size &&
+            $pos->getZ() >= $startZ && $pos->getZ() <= $startZ + $size) {
+            return true;
         }
-        return false;
     }
-
+    return false;
+}
+        
     // ✅ 섬 삭제
     public static function deleteIsland(Player $player): void {
         if (!self::hasIsland($player)) {
@@ -79,14 +69,6 @@ class IslandManager {
 
         $data = IslandConfig::getIsland($player->getName());
         $worldName = $data["world"];
-
-        $worldManager = Server::getInstance()->getWorldManager();
-        if ($worldManager->isWorldLoaded($worldName)) {
-            $world = $worldManager->getWorldByName($worldName);
-            if ($world !== null) {
-                $worldManager->unloadWorld($world);
-            }
-        }
 
         if (WorldManager::deleteWorld($worldName)) {
             IslandConfig::deleteIsland($player->getName());
@@ -105,16 +87,8 @@ class IslandManager {
 
         $data = IslandConfig::getIsland($player->getName());
         $worldName = $data["world"];
-        $location = new Vector3($data["location"]["x"], $data["location"]["y"], $data["location"]["z"]);
 
-        $worldManager = Server::getInstance()->getWorldManager();
-        if (!$worldManager->isWorldLoaded($worldName)) {
-            $worldManager->loadWorld($worldName);
-        }
-
-        $world = $worldManager->getWorldByName($worldName);
-        if ($world !== null) {
-            $player->teleport($world->getSafeSpawn());
+        if (WorldManager::teleportToWorld($player, $worldName)) {
             $player->sendMessage("§a섬으로 이동했습니다.");
         } else {
             $player->sendMessage("§c섬으로 이동할 수 없습니다.");
@@ -130,7 +104,6 @@ class IslandManager {
         return "§c섬 정보가 없습니다.";
     }
 
-    // ✅ 모든 섬 데이터 가져오기
     public static function getAllIslands(): array {
         return IslandConfig::getAllIslands();
     }
